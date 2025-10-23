@@ -193,11 +193,11 @@ def generate_q15_hex_values(mat, mapping):
 
 def main():
     base = os.path.dirname(os.path.abspath(__file__))
-    in_path = os.path.join(base, 'D:\\Desktop\\PG Repo\\MEL\\mel_fbank_tc\\convert\\mel_fb_float.txt')
-    mac_bits_out_path = os.path.join(base, 'D:\\Desktop\\PG Repo\\MEL\\mel_fbank_tc\\convert\\mac_bits.txt')
-    nz_idx_out_path = os.path.join(base, 'D:\\Desktop\\PG Repo\\MEL\\mel_fbank_tc\\convert\\mel_fb_idx.txt')
-    mapping_out_path = os.path.join(base, 'D:\\Desktop\\PG Repo\\MEL\\mel_fbank_tc\\convert\\mac_pos.txt')
-    q15_hex_out_path = os.path.join(base, 'D:\\Desktop\\PG Repo\\MEL\\mel_fbank_tc\\convert\\mac_q15_hex.txt')
+    in_path = os.path.join(base, 'mel_fb_float_64.txt')
+    mac_bits_out_path = os.path.join(base, 'mac_bits.txt')
+    nz_idx_out_path = os.path.join(base, 'mel_fb_idx.txt')
+    mapping_out_path = os.path.join(base, 'mac_pos.txt')
+    q15_hex_out_path = os.path.join(base, 'mac_q15_hex.txt')
 
     mat = np.loadtxt(in_path, dtype=float)
     get_nz_idx(mat, nz_idx_out_path)

@@ -9,6 +9,7 @@ module MEL_FBANK #(
     input rst_n,
     input fft_bin_vld,
     input [WIDTH-1:0] fft_bin,
+    input [8:0] fft_bin_idx,
     input [2*WIDTH-1:0] mel_fbank_weight,
    
     input [1:0] mac_bits,
@@ -37,7 +38,7 @@ module MEL_FBANK #(
         end else begin
             mel_mac_1_clear <= mel_mac_1_xor;
             mel_mac_2_clear <= mel_mac_2_xor;
-            mel_cnt <= mel_spec_vld ? mel_cnt + 1 : mel_cnt;
+            mel_cnt <= fft_bin_idx == 0 ? 0 : (mel_spec_vld ? mel_cnt + 1 : mel_cnt);
         end
     end
     

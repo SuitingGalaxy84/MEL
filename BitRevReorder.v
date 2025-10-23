@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
-//  Bit-Reversal Reordering with Ping-Pong Buffer
-//  Converts FFT bit-reversed output to natural order using double buffering
-//  for continuous streaming operation
+//  Bit-Reversal Reordering with Ping-Pong Buffer (Register File based)
+//  Converts FFT bit-reversed output to natural order.
+//  It accepts bit-reversed data and outputs it in natural order.
 //----------------------------------------------------------------------
 module BitRevReorder #(
     parameter N = 128,              // FFT size (must be power of 2)
@@ -23,7 +23,7 @@ module BitRevReorder #(
 );
 
 //----------------------------------------------------------------------
-//  Ping-Pong Dual-Port RAM
+//  Ping-Pong Dual-Port Register File
 //  Buffer A and Buffer B alternate between write and read
 //----------------------------------------------------------------------
 reg [WIDTH-1:0] bufA_re [0:N-1];
@@ -36,11 +36,11 @@ reg [WIDTH-1:0] bufB_im [0:N-1];
 //----------------------------------------------------------------------
 reg                 buf_sel;        // 0: Write to A, Read from B
                                     // 1: Write to B, Read from A
-reg [BITS-1:0]      wr_cnt;         // Write counter
-reg [BITS-1:0]      rd_cnt;         // Read counter
+reg [BITS-1:0]      wr_cnt;         // Write counter (sequential)
+reg [BITS-1:0]      rd_cnt;         // Read counter (sequential)
 reg                 wr_active;      // Write operation active
 reg                 rd_active;      // Read operation active
-reg                 first_frame;    // First frame flag (no data to read yet)
+reg                 first_frame;    // Flag to prevent reading before first write is complete
 
 //----------------------------------------------------------------------
 //  Bit-Reverse Function
@@ -57,11 +57,12 @@ function [BITS-1:0] bit_reverse;
 endfunction
 
 //----------------------------------------------------------------------
-//  Write Address Generation
-//  Input arrives in bit-reversed order, write at bit-reversed address
-//  to restore natural order when reading sequentially
+//  Address Generation
+//  Input is in bit-reversed order. We write to a bit-reversed address
+//  so the data is stored in natural order. Reading is done sequentially.
 //----------------------------------------------------------------------
 wire [BITS-1:0] wr_addr = bit_reverse(wr_cnt);
+wire [BITS-1:0] rd_addr = rd_cnt;
 
 //----------------------------------------------------------------------
 //  Write Logic - Buffer Switching
@@ -76,20 +77,21 @@ always @(posedge clock) begin
         if (di_en) begin
             wr_active <= 1;
             
-            // Write to selected buffer
-            if (buf_sel == 0) begin
+            // Write to the currently active write buffer
+            if (buf_sel == 0) begin // Write to A
                 bufA_re[wr_addr] <= di_re;
                 bufA_im[wr_addr] <= di_im;
-            end else begin
+            end else begin // Write to B
                 bufB_re[wr_addr] <= di_re;
                 bufB_im[wr_addr] <= di_im;
             end
             
-            // Increment write counter
+            // Increment write counter and swap buffers when full
             if (wr_cnt == N-1) begin
                 wr_cnt <= 0;
-                buf_sel <= ~buf_sel;    // Swap buffers
-                first_frame <= 0;       // First frame complete
+                buf_sel <= ~buf_sel;    // Swap buffers for next frame
+                first_frame <= 0;       // First frame is now written
+                wr_active <= 0;         // Finished writing this frame
             end else begin
                 wr_cnt <= wr_cnt + 1;
             end
@@ -98,6 +100,45 @@ always @(posedge clock) begin
 end
 
 //----------------------------------------------------------------------
+//  Read Logic - Buffer Switching
+//----------------------------------------------------------------------
+always @(posedge clock) begin
+    if (reset) begin
+        rd_cnt <= 0;
+        rd_active <= 0;
+        do_en <= 0;
+    end else begin
+        // Start reading a frame when the other buffer is full
+        if (wr_cnt == N-1 && di_en) begin
+             rd_active <= 1;
+        end
+
+        if (rd_active && !first_frame) begin
+            // Read from the inactive write buffer (the one that's full)
+            if (buf_sel == 0) begin // Read from B
+                do_re <= bufB_re[rd_addr];
+                do_im <= bufB_im[rd_addr];
+            end else begin // Read from A
+                do_re <= bufA_re[rd_addr];
+                do_im <= bufA_im[rd_addr];
+            end
+            do_en <= 1;
+            
+            // Increment read counter
+            if (rd_cnt == N-1) begin
+                rd_cnt <= 0;
+                rd_active <= 0; // Finished reading frame
+                do_en <= 0;
+            end else begin
+                rd_cnt <= rd_cnt + 1;
+            end
+        end else begin
+            do_en <= 0;
+        end
+    end
+end
+
+
 //  Read Logic - Sequential Output in Natural Order
 //----------------------------------------------------------------------
 reg rd_buf_sel;  // Read buffer selection (opposite of write buffer)

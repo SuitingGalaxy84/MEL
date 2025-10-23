@@ -35,15 +35,9 @@ module tb_Mel_fbank;
     reg [1:0] mac_bits_mem [0:NZ_MEL_SRAM_DEPTH-1];
 
     initial begin
-        $readmemb("D:\\Desktop\\PG Repo\\MEL\\mel_fbank_tc\\convert\\mac_bits.txt", mac_bits_mem);
+        $readmemb("convert/mac_bits.txt", mac_bits_mem);
         $display("Loaded mac_bits from mac_bits.txt");
-        // Debug: Display first few values
-        $display("DEBUG: mac_bits_mem[0] = %b", mac_bits_mem[0]);
-        $display("DEBUG: mac_bits_mem[3] = %b", mac_bits_mem[3]);
-        $display("DEBUG: mac_bits_mem[4] = %b", mac_bits_mem[4]);
-        $display("DEBUG: mac_bits_mem[10] = %b", mac_bits_mem[10]);
     end
-
 
     assign mac_bits = mac_bits_mem[fft_bin_idx];
 
@@ -51,34 +45,27 @@ module tb_Mel_fbank;
     // SRAM for mel filterbank weights
     reg [2*WIDTH-1:0] mel_fbank_mem [0:NZ_MEL_SRAM_DEPTH-1];
     
-    // Random Q1.15 FFT bin values
+    // FFT bin values from file
     reg [WIDTH-1:0] fft_bin_mem [0:NZ_MEL_SRAM_DEPTH-1];
     
-    // Load mel filterbank values from file
     initial begin
-        $readmemh("D:\\Desktop\\PG Repo\\MEL\\mel_fbank_tc\\convert\\mac_q15_hex.txt", mel_fbank_mem);
+        $readmemh("convert/mac_q15_hex.txt", mel_fbank_mem);
         $display("Loaded mel filterbank weights from mac_q15_hex.txt");
         
-        // Load random Q1.15 FFT bin values
-        $readmemh("D:\\Desktop\\PG Repo\\MEL\\mel_fbank_tc\\random_fft_bins_q15.txt", fft_bin_mem);
-        $display("Loaded random Q1.15 FFT bin values from random_fft_bins_q15.txt");
+        $readmemh("random_fft_bins_q15.txt", fft_bin_mem);
+        $display("Loaded FFT bin values from random_fft_bins_q15.txt");
     end
     
-    // SRAM read operation - COMBINATIONAL (no delay)
-    assign mel_fbank_weight = (fft_bin_idx < NZ_MEL_SRAM_DEPTH) ? 
-                                mel_fbank_mem[fft_bin_idx] : 32'h0;
+    assign mel_fbank_weight = mel_fbank_mem[fft_bin_idx];
 
     // DUT instantiation
-    MEL_FBANK #(
-        .WIDTH(WIDTH),
-        .N_MEL(N_MEL),
-        .N_FFT(N_FFT),
-        .NZ_MEL_SRAM_DEPTH(NZ_MEL_SRAM_DEPTH)
-    ) dut (
+    MEL_FBANK #(.WIDTH(WIDTH), .N_MEL(N_MEL)) 
+    dut (
         .clk(clk),
         .rst_n(rst_n),
         .fft_bin_vld(fft_bin_vld),
         .fft_bin(fft_bin),
+        .fft_bin_idx(fft_bin_idx),
         .mel_fbank_weight(mel_fbank_weight),
         .mac_bits(mac_bits),
         .mel_spec_vld(mel_spec_vld),
@@ -86,9 +73,10 @@ module tb_Mel_fbank;
         .mel_cnt(mel_cnt)
     );
 
-    // Test stimulus
+    // Test stimulus and simulation control
     integer i;
     integer output_file;
+    integer log_file;
     
     initial begin
         // Initialize signals
@@ -97,77 +85,90 @@ module tb_Mel_fbank;
         fft_bin = 0;
         fft_bin_idx = 0;
         
-        // Open output file for writing
+        // Open output files
         output_file = $fopen("mel_output.txt", "w");
-        if (output_file == 0) begin
-            $display("ERROR: Could not open output.txt for writing");
-            $finish;
-        end
+        log_file = $fopen("mel_output.log", "w");
         
         // VCD dump for waveform viewing
         $dumpfile("tb_Mel_fbank.vcd");
         $dumpvars(0, tb_Mel_fbank);
         
-        // Reset
+        // Apply Reset
         #(CLK_PERIOD*5);
         rst_n = 1;
         #(CLK_PERIOD*2);
         
-        $display("\n=== Starting MEL_FBANK Test ===\n");
-        $display("Time\t\tIdx\tFFT_Bin\t\tMAC_Bits\tWeight[31:16]\tWeight[15:0]\tMel_Spec\tVld");
-        $display("-------------------------------------------------------------------------------------------");
+        // Write Log Header
+        $fwrite(log_file, "\n=== Starting MEL_FBANK Test ===\n");
+        $fwrite(log_file, "Time\t\tIdx\tFFT_Bin\t\tMAC_Bits\tWeight[31:16]\tWeight[15:0]\tMel_Spec\tVld\n");
+        $fwrite(log_file, "-------------------------------------------------------------------------------------------\n");
         
-        // Test: Feed FFT bins through the filterbank
+        // Test: Feed all 257 FFT bins into the filterbank
         for (i = 0; i < 257; i = i + 1) begin
             @(posedge clk);
-            fft_bin_idx = i;
             fft_bin_vld = 1;
-            fft_bin = fft_bin_mem[i]; // Use random Q1.15 values from memory
-            
-            #1; // Small delay for signal propagation before display
-            $display("%0t\t%d\t%h\t%b\t\t%h\t%h\t%h\t%b",
-                     $time, fft_bin_idx, fft_bin, mac_bits, 
-                     mel_fbank_weight[31:16], mel_fbank_weight[15:0],
-                     mel_spec, mel_spec_vld);
-            
-            // Additional debug for indices where we expect 11
-            if (i == 3 || i == 4 || i == 10 || i == 11 || i == 12) begin
-                $display("  -> DEBUG idx=%d: mac_bits_mem[%d]=%b, mac_bits=%b", 
-                         i, i, mac_bits_mem[i], mac_bits);
-            end
+            fft_bin_idx = i;
+            fft_bin = fft_bin_mem[i];
         end
         
-        // Continue for a few more cycles to see final outputs
+        // After sending all inputs, de-assert valid signal
+        @(posedge clk);
         fft_bin_vld = 0;
-        repeat(10) @(posedge clk);
         
-        // Close output file
+        // *** CHANGE START: Correctly wait for the simulation to finish ***
+        // Wait until the DUT has produced all N_MEL outputs
+        $display ("\\n=== All inputs sent. Waiting for final %0d outputs... ===\\n", N_MEL);
+        wait(mel_cnt == N_MEL);
+        
+        // Wait a couple more cycles for the last log message to be written
+        #(CLK_PERIOD * 2);
+        // *** CHANGE END ***
+
+        // Clean up and finish
         $fclose(output_file);
+        $fclose(log_file);
         
-        $display("\n=== Test Completed ===\n");
+        $display("\\n=== Test Completed: %0d outputs received. ===\\n", mel_cnt);
+        $display("Log written to mel_output.log");
         $display("Output written to mel_output.txt");
         $finish;
     end
     
-    // Monitor for valid mel spectrum outputs
+    // *** NEW: Event-driven block for logging INPUTS when they are valid ***
     always @(posedge clk) begin
-        if (mel_spec_vld && mel_cnt < N_MEL) begin
-            $display("*** Valid Mel Spectrum Output [%0d]: %h at time %0t", mel_cnt, mel_spec, $time);
-            // Write to output file only until we reach N_MEL outputs
-            $fwrite(output_file, "%h\n", mel_spec);
-        end else if (mel_spec_vld && mel_cnt >= N_MEL) begin
-            $display("*** Mel Spectrum Output [%0d] (not recorded - exceeded N_MEL): %h at time %0t", mel_cnt, mel_spec, $time);
+        // Use #1 to log the values *after* they have propagated in the current cycle
+        #1; 
+        if (fft_bin_vld) begin
+            $fwrite(log_file, "%0t\t\t%d\t%h\t\t%b\t\t\t%h\t\t\t%h\t\t\t%h\t\t\t%b\n",
+                     $time, fft_bin_idx, fft_bin, mac_bits, 
+                     mel_fbank_weight[31:16], mel_fbank_weight[15:0],
+                     mel_spec, mel_spec_vld);
         end
     end
+    
+    // Monitor for valid mel spectrum OUTPUTS
+    always @(posedge clk) begin
+        if (mel_spec_vld) begin
+             // This logic correctly distinguishes between valid and excess outputs
+            if(mel_cnt < N_MEL) begin
+                $fwrite(log_file, "*** Valid Mel Spectrum Output [%0d]: %h at time %0t\n", mel_cnt, mel_spec, $time);
+                $fwrite(output_file, "%h\n", mel_spec);
+            end else begin
+                $fwrite(log_file, "*** Mel Spectrum Output [%0d] (not recorded - exceeded N_MEL): %h at time %0t\n", mel_cnt, mel_spec, $time);
+            end
+        end
+    end
+    
     // Timeout watchdog
     initial begin
-        #100000; // 100us timeout
+        #500000; // 500us timeout, increased to be safe
         $display("ERROR: Simulation timeout!");
+        $fclose(output_file);
+        $fclose(log_file);
         $finish;
     end
 
-
-// Include external stimuli/logger
-`include "stim_fbank.v"
+    // REMOVED: No longer need the external stimulus file
+    // `include "stim_fbank.v"
 
 endmodule
