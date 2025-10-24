@@ -6,12 +6,12 @@ Write-Host "====================================" -ForegroundColor Cyan
 Set-Location -Path $PSScriptRoot
 
 Write-Host "[Step 1] Generating mel filterbank coefficients..." -ForegroundColor Yellow
-python3.exe convert/encode_mel_fb.py
+python convert/encode_mel_fb.py
 if ($LASTEXITCODE -ne 0) { Write-Host "[ERROR] Failed to generate mel filterbank coefficients!" -ForegroundColor Red; exit 1 }
 Write-Host "  [OK] Generated mel filterbank coefficients" -ForegroundColor Green
 
 Write-Host "[Step 2] Generating q15 test data..." -ForegroundColor Yellow
-python3.exe data_gen_q15.py
+python data_gen_q15.py
 if ($LASTEXITCODE -ne 0) { Write-Host "[ERROR] Failed to generate q15 test data!" -ForegroundColor Red; exit 1 }
 Write-Host "  [OK] Generated q15 test data" -ForegroundColor Green
 

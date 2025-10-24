@@ -9,11 +9,11 @@ python3 verify.py generate
 
 # Compile the Verilog files
 echo "--- Compiling Verilog files ---"
-iverilog -o tb_bitrev.vvp ../BitRevReorder.v tb_BitRevReorder.v
+iverilog -o tb_brr_pp.vvp ../BitRevReorder.v tb_BRR_PP.v
 
 # Run the simulation
 echo "--- Running simulation ---"
-vvp tb_bitrev.vvp
+vvp tb_brr_pp.vvp
 
 # Verify the output
 echo "--- Verifying output ---"

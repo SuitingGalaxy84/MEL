@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module tb_BitRevReorder;
+module tb_BRR_PP;
 
     // Parameters
     localparam N = 128;
@@ -20,7 +20,7 @@ module tb_BitRevReorder;
     wire [WIDTH-1:0]    do_im;
 
     // Instantiate the DUT
-    BitRevReorder #(
+    BRR_PP #(
         .N(N),
         .BITS(BITS),
         .WIDTH(WIDTH)
@@ -83,13 +83,14 @@ module tb_BitRevReorder;
     endtask
 
     // Monitor and save output to a file
+    integer outfile;
     initial begin
         // File for verification - Declaration must be before use.
-        integer outfile;
+        
 
-        $dumpfile("tb_BitRevReorder.vcd");
-        $dumpvars(0, tb_BitRevReorder);
-        $monitor("Time: %0t, di_en: %b, di_re: %d, di_im: %d -> do_en: %b, do_re: %d, do_im: %d",
+        $dumpfile("tb_brr_pp.vcd");
+        $dumpvars(0, tb_BRR_PP);
+        $monitor("Time:%0t\t\tdi_en: %b\tdi_re: %d\tdi_im: %d -> do_en: %b\tdo_re: %d\tdo_im: %d",
                  $time, di_en, di_re, di_im, do_en, do_re, do_im);
         
         outfile = $fopen("output.txt", "w");

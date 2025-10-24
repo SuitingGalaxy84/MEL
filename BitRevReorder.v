@@ -3,7 +3,7 @@
 //  Converts FFT bit-reversed output to natural order.
 //  It accepts bit-reversed data and outputs it in natural order.
 //----------------------------------------------------------------------
-module BitRevReorder #(
+module BRR_PP #(
     parameter N = 128,              // FFT size (must be power of 2)
     parameter BITS = 7,             // log2(N) - address width
     parameter WIDTH = 16            // Data width for real/imag components
@@ -139,50 +139,50 @@ always @(posedge clock) begin
 end
 
 
-//  Read Logic - Sequential Output in Natural Order
-//----------------------------------------------------------------------
-reg rd_buf_sel;  // Read buffer selection (opposite of write buffer)
+////  Read Logic - Sequential Output in Natural Order
+////----------------------------------------------------------------------
+//reg rd_buf_sel;  // Read buffer selection (opposite of write buffer)
 
-always @(posedge clock) begin
-    if (reset) begin
-        rd_cnt <= 0;
-        rd_active <= 0;
-        rd_buf_sel <= 1;  // Start reading from opposite buffer
-        do_en <= 0;
-        do_re <= 0;
-        do_im <= 0;
-    end else begin
-        // Start reading when first frame is complete and we're not currently writing to this buffer
-        if (!first_frame && !rd_active) begin
-            rd_active <= 1;
-            rd_cnt <= 0;
-        end
+//always @(posedge clock) begin
+//    if (reset) begin
+//        rd_cnt <= 0;
+//        rd_active <= 0;
+//        rd_buf_sel <= 1;  // Start reading from opposite buffer
+//        do_en <= 0;
+//        do_re <= 0;
+//        do_im <= 0;
+//    end else begin
+//        // Start reading when first frame is complete and we're not currently writing to this buffer
+//        if (!first_frame && !rd_active) begin
+//            rd_active <= 1;
+//            rd_cnt <= 0;
+//        end
         
-        if (rd_active) begin
-            // Read from the buffer that's not being written to
-            if (rd_buf_sel == 0) begin
-                do_re <= bufA_re[rd_cnt];
-                do_im <= bufA_im[rd_cnt];
-            end else begin
-                do_re <= bufB_re[rd_cnt];
-                do_im <= bufB_im[rd_cnt];
-            end
+//        if (rd_active) begin
+//            // Read from the buffer that's not being written to
+//            if (rd_buf_sel == 0) begin
+//                do_re <= bufA_re[rd_cnt];
+//                do_im <= bufA_im[rd_cnt];
+//            end else begin
+//                do_re <= bufB_re[rd_cnt];
+//                do_im <= bufB_im[rd_cnt];
+//            end
             
-            do_en <= 1;
+//            do_en <= 1;
             
-            // Increment read counter
-            if (rd_cnt == N-1) begin
-                rd_cnt <= 0;
-                rd_active <= 0;
-                rd_buf_sel <= ~rd_buf_sel;  // Swap read buffer
-            end else begin
-                rd_cnt <= rd_cnt + 1;
-            end
-        end else begin
-            do_en <= 0;
-        end
-    end
-end
+//            // Increment read counter
+//            if (rd_cnt == N-1) begin
+//                rd_cnt <= 0;
+//                rd_active <= 0;
+//                rd_buf_sel <= ~rd_buf_sel;  // Swap read buffer
+//            end else begin
+//                rd_cnt <= rd_cnt + 1;
+//            end
+//        end else begin
+//            do_en <= 0;
+//        end
+//    end
+//end
 
 //----------------------------------------------------------------------
 //  Synthesis Notes:

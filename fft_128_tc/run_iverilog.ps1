@@ -1,6 +1,9 @@
 # PowerShell script to compile and run FFT128 testbench using iverilog
 # Author: Auto-generated
 # Date: October 22, 2025
+Write-Host '--- Generateing test data ---'
+python verify_fft.py generate
+
 
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host "FFT128 Testbench - Icarus Verilog" -ForegroundColor Cyan
@@ -94,3 +97,6 @@ if ($success) {
     Write-Host "SIMULATION COMPLETED WITH ERRORS!" -ForegroundColor Red
 }
 Write-Host "====================================" -ForegroundColor Cyan
+
+Write-Host "--- Verifying bit-reversal of FFT output ---" -ForegroundColor Yellow
+python verify_fft.py verify
