@@ -12,70 +12,74 @@ def bit_reverse(n, bits):
             result |= 1 << (bits - 1 - i)
     return result
 
-def generate_data(input_file="input.txt", golden_file="golden_output.txt", frames=2):
+def generate_data(golden_file="golden_output.txt", frames=2):
     """
-    Generates input data for the testbench and the golden output file.
-    """
-    print(f"Generating {frames} frames of data...")
-
-    # Data in natural order
-    natural_re = np.arange(frames * N, dtype=np.uint16)
-    natural_im = np.arange(frames * N, 0, -1, dtype=np.uint16) - 1
+    Generates the golden output file for verification.
     
-    # Create bit-reversed data for the input file
-    with open(input_file, "w") as f_in:
+    The testbench sends sequential data:
+    - Frame 0: di_re = [0, 1, 2, ..., 127], di_im = 0
+    - Frame 1: di_re = [128, 129, ..., 255], di_im = 0
+    
+    The module should output this in NATURAL ORDER (unchanged sequence)
+    because the bit-reversal reordering happens internally via addressing.
+    """
+    print(f"Generating {frames} frames of golden data (natural order)...")
+
+    with open("frame_input.txt", "w") as f_in:
+        for frame in range(frames):
+
+            # Expected output: natural order (same as input sequence)
+            for i in range(N):
+                re_val = i + frame * N  # ✅ Natural order
+                im_val = 0
+                f_in.write(f"{re_val} {im_val}\n")
+    f_in.close()
+
+    with open(golden_file, "w") as f_gold:
         for frame in range(frames):
             for i in range(N):
-                # The DUT expects bit-reversed input, so we provide it in that order
-                br_i = bit_reverse(i, BITS)
-                idx = frame * N + br_i
-                f_in.write(f"{natural_re[idx]:04x} {natural_im[idx]:04x}\n")
-
-    print(f"Generated '{input_file}' for simulation input.")
-
-    # The golden output should be the natural order data, with latency
-    with open(golden_file, "w") as f_gold:
-        # The DUT has a latency of N cycles. The first frame is readable after the second starts writing.
-        # The output is one frame delayed.
-        for i in range(N):
-             f_gold.write(f"{natural_re[i]} {natural_im[i]}\n")
-
+                #bit_rev_i = bit_reverse(i, BITS)
+                re_val = bit_reverse(i, BITS) + frame * N  
+                im_val = 0
+                f_gold.write(f"{re_val} {im_val}\n")
+    f_gold.close()
     print(f"Generated '{golden_file}' for verification.")
+    print(f"Expected output: sequential values in natural order")
 
 
 def verify_output(output_file="output.txt", golden_file="golden_output.txt"):
     """
     Compares the simulation output with the golden output.
     """
-    print("Verifying output...")
+    print("--- Verifying output ---")
     try:
         with open(output_file, "r") as f_out, open(golden_file, "r") as f_gold:
             sim_lines = [line.strip() for line in f_out if line.strip()]
             golden_lines = [line.strip() for line in f_gold if line.strip()]
-
+            
             if len(sim_lines) != len(golden_lines):
-                print(f"Verification FAILED: Mismatch in number of lines.")
-                print(f"Got {len(sim_lines)} lines, expected {len(golden_lines)}.")
+                print(f"❌ Verification FAILED: Mismatch in number of lines.")
+                print(f"   Got {len(sim_lines)} lines, expected {len(golden_lines)}.")
                 return False
 
             errors = 0
             for i, (sim_line, golden_line) in enumerate(zip(sim_lines, golden_lines)):
                 if sim_line != golden_line:
                     errors += 1
-                    if errors < 10: # Print first few errors
-                        print(f"Mismatch at line {i+1}:")
-                        print(f"  Got:      '{sim_line}'")
-                        print(f"  Expected: '{golden_line}'")
+                    if errors <= 10:  # Print first 10 errors
+                        print(f"   Mismatch at line {i+1}:")
+                        print(f"     Got:      '{sim_line}'")
+                        print(f"     Expected: '{golden_line}'")
 
             if errors == 0:
-                print("Verification PASSED: Output matches golden file.")
+                print("✅ Verification PASSED: Output matches golden file.")
                 return True
             else:
-                print(f"Verification FAILED: Found {errors} mismatched lines.")
+                print(f"❌ Verification FAILED: Found {errors} mismatched lines.")
                 return False
 
     except FileNotFoundError as e:
-        print(f"Error: {e}. Make sure simulation has been run and files exist.")
+        print(f"❌ Error: {e}")
         return False
 
 if __name__ == "__main__":

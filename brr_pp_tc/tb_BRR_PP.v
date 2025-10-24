@@ -2,105 +2,148 @@
 
 module tb_BRR_PP;
 
-    // Parameters
-    localparam N = 128;
-    localparam BITS = 7;
-    localparam WIDTH = 16;
+    // Parameters matching the DUT and verification script
+    localparam ADDR_WIDTH = 7;
+    localparam DATA_WIDTH = 16;
+    localparam DEPTH      = 1 << ADDR_WIDTH; // Should be 128
     localparam CLK_PERIOD = 10;
 
     // Testbench signals
-    reg                 clock;
-    reg                 reset;
-    reg                 di_en;
-    reg  [WIDTH-1:0]    di_re;
-    reg  [WIDTH-1:0]    di_im;
+    reg                      clk;
+    reg                      rst;
+    reg                      wr_en;
+    reg                      rd_en;
+    reg  [DATA_WIDTH-1:0]    data_in;
 
-    wire                do_en;
-    wire [WIDTH-1:0]    do_re;
-    wire [WIDTH-1:0]    do_im;
+    wire [DATA_WIDTH-1:0]    data_out;
+    wire                     buffer_full;
+    wire                     buffer_empty;
 
-    // Instantiate the DUT
+    // Instantiate the DUT (Device Under Test)
     BRR_PP #(
-        .N(N),
-        .BITS(BITS),
-        .WIDTH(WIDTH)
+        .DATA_WIDTH(DATA_WIDTH),
+        .ADDR_WIDTH(ADDR_WIDTH)
     ) DUT (
-        .clock(clock),
-        .reset(reset),
-        .di_en(di_en),
-        .di_re(di_re),
-        .di_im(di_im),
-        .do_en(do_en),
-        .do_re(do_re),
-        .do_im(do_im)
+        .clk(clk),
+        .rst(rst),
+        .wr_en(wr_en),
+        .rd_en(rd_en),
+        .data_in(data_in),
+        .data_out(data_out),
+        .buffer_full(buffer_full),
+        .buffer_empty(buffer_empty)
     );
 
     // Clock generation
-    always #(CLK_PERIOD/2) clock = ~clock;
-
-    // Stimulus
     initial begin
-        // Initialize signals
-        clock = 0;
-        reset = 1;
-        di_en = 0;
-        di_re = 0;
-        di_im = 0;
+        clk = 0;
+        forever #(CLK_PERIOD/2) clk = ~clk;
+    end
 
-        // Reset sequence
-        #100;
-        reset = 0;
-        #100;
-        reset = 1;
+    // Main stimulus block
+    initial begin
+        // 1. Initialize and Reset
+        $display("Starting testbench...");
+        rst = 1;
+        wr_en = 0;
+        rd_en = 0;
+        data_in = 0;
+        #(CLK_PERIOD * 5);
+        rst = 0;
+        #(CLK_PERIOD);
+
+        // Wait for reset to de-assert
+        @(posedge clk);
+        $display("Reset released. Starting data transmission.");
+
+        // 2. Write the first frame of data (to Buffer A)
+        $display("Writing Frame 0...");
+        write_frame(0);
+
+        // After writing, the 'other' buffer is now ready for reading.
+        // We must wait one cycle for the read address to be registered.
+        @(posedge clk);
+
+        // 3. Simultaneously READ Frame 0 (from Buffer A) and WRITE Frame 1 (to Buffer B)
+        $display("Concurrently Reading Frame 0 and Writing Frame 1...");
+        fork
+            read_frame();
+            write_frame(1);
+        join
         
-        // Wait for reset to propagate
-        @(posedge clock);
-        reset = 0;
-        @(posedge clock);
+        // Wait one cycle for read address to be registered.
+        @(posedge clk);
 
-        // Send two frames of data
-        send_frame(0);
-        send_frame(1);
+        // 4. Read the second frame of data (from Buffer B)
+        $display("Reading Frame 1...");
+        read_frame();
 
-        #2000;
+        // End of test
+        #(CLK_PERIOD * 10);
+        $display("Test finished.");
         $finish;
     end
 
-    // Task to send one frame of data
-    task send_frame;
-        input frame_num;
+    function [ADDR_WIDTH-1:0] bit_reverse;
+        input [ADDR_WIDTH-1:0] in;
         integer i;
         begin
-            for (i = 0; i < N; i = i + 1) begin
-                @(posedge clock);
-                di_en = 1;
-                di_re = i + frame_num * N;
-                di_im = N - 1 - i + frame_num * N;
+            for (i = 0; i < ADDR_WIDTH; i = i + 1)
+                bit_reverse[i] = in[ADDR_WIDTH-1-i];
+        end
+    endfunction
+
+    // Task to write one frame of data
+    task write_frame;
+
+        
+        input integer frame_num;
+        integer i;
+        begin
+            wr_en = 1;
+            #CLK_PERIOD;
+            for (i = 0; i < DEPTH; i = i + 1) begin
+                
+                // Send sequential data values
+                data_in = bit_reverse(i) + frame_num * DEPTH;
+                #CLK_PERIOD;
             end
-            @(posedge clock);
-            di_en = 0;
+            @(posedge clk);
+            wr_en = 0;
         end
     endtask
 
-    // Monitor and save output to a file
+    // Task to read one frame of data
+    task read_frame;
+        integer i;
+        begin
+            for (i = 0; i < DEPTH; i = i + 1) begin
+                @(posedge clk);
+                rd_en = 1;
+            end
+            @(posedge clk);
+            rd_en = 0;
+        end
+    endtask
+
+    // Monitor: Save output data to a file for verification
     integer outfile;
     initial begin
-        // File for verification - Declaration must be before use.
-        
-
+        // Setup simulation dump
         $dumpfile("tb_brr_pp.vcd");
         $dumpvars(0, tb_BRR_PP);
-        $monitor("Time:%0t\t\tdi_en: %b\tdi_re: %d\tdi_im: %d -> do_en: %b\tdo_re: %d\tdo_im: %d",
-                 $time, di_en, di_re, di_im, do_en, do_re, do_im);
-        
+
+        // Open file for output
         outfile = $fopen("output.txt", "w");
         
-        forever @(posedge clock) begin
-            if (do_en) begin
-                $fdisplay(outfile, "%d %d", do_re, do_im);
+        // Forever loop to monitor the output
+        forever @(posedge clk) begin
+            // Data is valid on the cycle that rd_en is high
+            if (rd_en) begin
+                #CLK_PERIOD; // Wait for data_out to stabilize
+                $fdisplay(outfile, "%d %d", data_out, 0);
             end
         end
     end
-
 
 endmodule
