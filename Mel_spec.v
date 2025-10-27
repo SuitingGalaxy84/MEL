@@ -30,6 +30,10 @@ module Mel_spec #(
     wire pwd_odata_en;
     wire [2*WIDTH-1:0] stft_odata_raw; // STFT output
     wire [WIDTH-1:0] fft_bin; // Q1.15 power spectrum value
+
+    wire [WIDTH-1:0] fft_bin_reordered;
+    wire fft_bin_reordered_rdy;
+
     localparam FFT_IDX_WIDTH = $clog2(N_FFT/2+1);
     assign fft_bin = stft_odata_raw[WIDTH-1:0];
     wire [FFT_IDX_WIDTH-1:0] fft_bin_idx;
@@ -39,10 +43,10 @@ module Mel_spec #(
         .N_FFT(N_FFT),
         .MEL_BANDS(MEL_BANDS)
     ) BIN_CNT_inst (
-        .clk                (clk                ),
-        .rst_n              (rst_n              ),
-        .pwd_odata_en       (pwd_odata_en       ),
-        .fft_bin_idx        (fft_bin_idx        )
+        .clk                (clk                    ),
+        .rst_n              (rst_n                  ),
+        .pwd_odata_en       (fft_bin_reordered_rdy  ),
+        .fft_bin_idx        (fft_bin_idx            )
     );
     
 
@@ -77,13 +81,24 @@ module Mel_spec #(
         .N_MEL      (MEL_BANDS),
         .N_FFT      (N_FFT)
     ) MEL_FBANK_inst (
-        .clk                (clk),
-        .rst_n              (rst_n),
-        .fft_bin_vld        (pwd_odata_en),
-        .fft_bin            (fft_bin),
-        .fft_bin_idx        (fft_bin_idx),
-        .mel_spec_vld       (mel_avail),
-        .mel_spec           (mel_data)
+        .clk                (clk                    ),
+        .rst_n              (rst_n                  ),
+        .fft_bin_vld        (fft_bin_reordered_rdy  ),
+        .fft_bin            (fft_bin_reordered      ),
+        .fft_bin_idx        (fft_bin_idx            ),
+        .mel_spec_vld       (mel_avail              ),
+        .mel_spec           (mel_data               )
     );
 
+    PP_BUFFER #(
+        .WIDTH(WIDTH),
+        .DEPTH(N_FFT / 2 + 1)
+    ) PP_BUFFER_inst (
+        .clk                (clk                    ),
+        .rst_n              (rst_n                  ),
+        .data_in            (fft_bin                ),
+        .data_valid         (pwd_odata_en           ),
+        .data_out           (fft_bin_reordered      ),
+        .data_ready         (fft_bin_reordered_rdy  )
+    )
 endmodule

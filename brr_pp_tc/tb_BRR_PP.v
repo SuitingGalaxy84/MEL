@@ -53,7 +53,6 @@ module tb_BRR_PP;
         #(CLK_PERIOD);
 
         // Wait for reset to de-assert
-        @(posedge clk);
         $display("Reset released. Starting data transmission.");
 
         // 2. Write the first frame of data (to Buffer A)
@@ -101,12 +100,11 @@ module tb_BRR_PP;
         integer i;
         begin
             wr_en = 1;
-            #CLK_PERIOD;
             for (i = 0; i < DEPTH; i = i + 1) begin
                 
                 // Send sequential data values
-                data_in = bit_reverse(i) + frame_num * DEPTH;
-                #CLK_PERIOD;
+                data_in = bit_reverse(i) + frame_num * DEPTH + 1;
+                @(posedge clk);
             end
             @(posedge clk);
             wr_en = 0;
@@ -118,8 +116,8 @@ module tb_BRR_PP;
         integer i;
         begin
             for (i = 0; i < DEPTH; i = i + 1) begin
-                @(posedge clk);
                 rd_en = 1;
+                @(posedge clk);
             end
             @(posedge clk);
             rd_en = 0;
