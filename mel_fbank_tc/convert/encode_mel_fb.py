@@ -193,7 +193,7 @@ def generate_q15_hex_values(mat, mapping):
 
 def main():
     base = os.path.dirname(os.path.abspath(__file__))
-    in_path = os.path.join(base, 'mel_fb_float_64.txt')
+    in_path = os.path.join(base, 'mel_fb_float.txt')
     mac_bits_out_path = os.path.join(base, 'mac_bits.txt')
     nz_idx_out_path = os.path.join(base, 'mel_fb_idx.txt')
     mapping_out_path = os.path.join(base, 'mac_pos.txt')

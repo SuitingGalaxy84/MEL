@@ -1,0 +1,8 @@
+Unused items in cpu_top.v:
+
+- wire [31:0] id_data1;
+- reg [31:0] id_ex_data1;
+- reg [3:0]  id_ex_alu_control;
+- reg        id_ex_alu_src_b;
+- reg        id_ex_reg_write;
+- reg        mem_wb_reg_write;

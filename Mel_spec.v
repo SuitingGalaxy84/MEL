@@ -1,4 +1,4 @@
-module Mel_spec #(
+module MEL_SPEC #(
     parameter WIDTH             = 16,
     parameter N_FRAMES          = 101,
     parameter N_FFT             = 512,
@@ -9,8 +9,7 @@ module Mel_spec #(
     // Derived parameters for module instantiation
     parameter N_FFT_MAX         = $clog2(N_FFT),
     parameter WIN_LEN_MAX       = $clog2(WIN_LEN),
-    parameter HOP_LEN_MAX       = $clog2(HOP_LEN),
-    parameter SPEC_ADDR_WIDTH   = $clog2(N_FRAMES * MEL_BANDS)
+    parameter HOP_LEN_MAX       = $clog2(HOP_LEN)
 ) (
     input                       clk,
     input                       rst_n,
@@ -100,5 +99,6 @@ module Mel_spec #(
         .data_valid         (pwd_odata_en           ),
         .data_out           (fft_bin_reordered      ),
         .data_ready         (fft_bin_reordered_rdy  )
-    )
+    );
+    
 endmodule

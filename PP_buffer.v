@@ -1,4 +1,4 @@
-module PP_buffer#(
+module PP_BUFFER#(
     parameter WIDTH = 8,
     parameter DEPTH = 128,
     parameter ADDR_WIDTH = $clog2(DEPTH)

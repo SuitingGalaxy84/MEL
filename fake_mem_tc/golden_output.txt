@@ -1,0 +1,32 @@
+// Golden output for fake_mem testbench
+// Format: Address -> 32-bit output (4 bytes concatenated)
+// Addr   0: 00010203
+00010203
+// Addr   4: 04050607
+04050607
+// Addr   8: 08090A0B
+08090A0B
+// Addr  12: 0C0D0E0F
+0C0D0E0F
+// Addr  16: 10111213
+10111213
+// Addr  32: 20212223
+20212223
+// Addr  64: 40414243
+40414243
+// Addr  96: 60616263
+60616263
+// Addr 128: FFFEFDFC
+FFFEFDFC
+// Addr 192: BFBEBDBC
+BFBEBDBC
+// Addr 252: 83828180
+83828180
+// Addr 256: AA55AA55
+AA55AA55
+// Addr 300: AA55AA55
+AA55AA55
+// Addr 304: AA55AA55
+AA55AA55
+// Addr 308: AA55AA55
+AA55AA55

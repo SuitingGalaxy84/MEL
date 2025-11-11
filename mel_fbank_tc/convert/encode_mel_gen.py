@@ -2,7 +2,7 @@ import torch
 import torchaudio
 from torchaudio.transforms import MelSpectrogram, InverseMelScale
 
-NUM_MELS = 128
+NUM_MELS = 40
 
 mel_spec = MelSpectrogram(
     sample_rate=16000,
