@@ -265,7 +265,7 @@ assign  tw_sel[0] = bf2_count[LOG_M-1];
 assign  tw_num = bf2_count << (LOG_N-LOG_M);
 assign  tw_addr = tw_num * tw_sel;
 
-Twiddle #(.TW_FF(TW_FF)) TW (
+Twiddle512 #(.TW_FF(TW_FF)) TW (
     .clock  (clock      ),  //  i
     .addr   (tw_addr_tc ),  //  i
     .tw_re  (tw_re      ),  //  o

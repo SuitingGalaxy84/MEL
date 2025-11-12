@@ -21,8 +21,8 @@ module MEL_SPEC #(
    
     input [WIDTH-1:0]           signal_re, // real input signal
     input [WIDTH-1:0]           signal_im, // imag input signal
+    
     output[WIDTH-1:0]           mel_data,
-
     output                      mel_avail
 );
 
@@ -52,19 +52,14 @@ module MEL_SPEC #(
     // STFT module instance: Obtain Power Spectrum
     STFT #(
         .WIDTH              (WIDTH          ),
-        .N_FFT_MAX          (N_FFT_MAX      ),
-        .WIN_LEN_MAX        (WIN_LEN_MAX    ),
-        .HOP_LEN_MAX        (HOP_LEN_MAX    )
+        .N_FFT              (N_FFT          ),
+        .WIN_LEN            (WIN_LEN        ),
+        .HOP_LEN            (HOP_LEN        )
     ) STFT_inst (
         .clk                (clk                ),
         .rst_n              (rst_n              ),
         .lut_en             (win_coe_lut_en     ),
         .den                (start              ),
-        .n_fft              (N_FFT              ),
-        .win_len            (WIN_LEN            ),
-        .hop_len            (HOP_LEN            ),
-        .is_real            (1'b1               ),
-        .pow2               (1'b1               ),
         .win_coe            (win_coe            ),
         .din_re             (signal_re          ),
         .din_im             (signal_im          ),

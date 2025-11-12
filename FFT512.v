@@ -1,0 +1,113 @@
+//----------------------------------------------------------------------
+//  FFT512: 512-Point FFT Using Radix-2^2 Single-Path Delay Feedback
+//----------------------------------------------------------------------
+module FFT512 #(
+    parameter   WIDTH = 16,
+    parameter   N_FFT = 512
+)(
+    input               clock,  //  Master Clock
+    input               reset,  //  Active High Asynchronous Reset
+    input               di_en,  //  Input Data Enable
+    input   [WIDTH-1:0] di_re,  //  Input Data (Real)
+    input   [WIDTH-1:0] di_im,  //  Input Data (Imag)
+    output              do_en,  //  Output Data Enable
+    output  [WIDTH-1:0] do_re,  //  Output Data (Real)
+    output  [WIDTH-1:0] do_im,   //  Output Data (Imag)
+    output reg [9:0]    fft_cnt,
+    output reg          fft_rdy
+);
+//----------------------------------------------------------------------
+//  Data must be input consecutively in natural order.
+//  The result is scaled to 1/N and output in bit-reversed order.
+//  512 = 2^9, so we need 5 stages with log2(512) = 9 bits
+//  Stage 1: N=512, M=512
+//  Stage 2: N=512, M=128
+//  Stage 3: N=512, M=32
+//  Stage 4: N=512, M=8
+//  Stage 5: N=512, M=2
+//----------------------------------------------------------------------
+
+wire            su1_do_en;
+wire[WIDTH-1:0] su1_do_re;
+wire[WIDTH-1:0] su1_do_im;
+wire            su2_do_en;
+wire[WIDTH-1:0] su2_do_re;
+wire[WIDTH-1:0] su2_do_im;
+wire            su3_do_en;
+wire[WIDTH-1:0] su3_do_re;
+wire[WIDTH-1:0] su3_do_im;
+wire            su4_do_en;
+wire[WIDTH-1:0] su4_do_re;
+wire[WIDTH-1:0] su4_do_im;
+wire            su5_do_en;
+wire[WIDTH-1:0] su5_do_re;
+wire[WIDTH-1:0] su5_do_im;
+
+SdfUnit #(.N(512),.M(512),.WIDTH(WIDTH)) SU1 (
+    .clock  (clock      ),  //  i
+    .reset  (reset      ),  //  i
+    .di_en  (di_en      ),  //  i
+    .di_re  (di_re      ),  //  i
+    .di_im  (di_im      ),  //  i
+    .do_en  (su1_do_en  ),  //  o
+    .do_re  (su1_do_re  ),  //  o
+    .do_im  (su1_do_im  )   //  o
+);
+
+SdfUnit #(.N(512),.M(128),.WIDTH(WIDTH)) SU2 (
+    .clock  (clock      ),  //  i
+    .reset  (reset      ),  //  i
+    .di_en  (su1_do_en  ),  //  i
+    .di_re  (su1_do_re  ),  //  i
+    .di_im  (su1_do_im  ),  //  i
+    .do_en  (su2_do_en  ),  //  o
+    .do_re  (su2_do_re  ),  //  o
+    .do_im  (su2_do_im  )   //  o
+);
+
+SdfUnit #(.N(512),.M(32),.WIDTH(WIDTH)) SU3 (
+    .clock  (clock      ),  //  i
+    .reset  (reset      ),  //  i
+    .di_en  (su2_do_en  ),  //  i
+    .di_re  (su2_do_re  ),  //  i
+    .di_im  (su2_do_im  ),  //  i
+    .do_en  (su3_do_en  ),  //  o
+    .do_re  (su3_do_re  ),  //  o
+    .do_im  (su3_do_im  )   //  o
+);
+
+SdfUnit #(.N(512),.M(8),.WIDTH(WIDTH)) SU4 (
+    .clock  (clock      ),  //  i
+    .reset  (reset      ),  //  i
+    .di_en  (su3_do_en  ),  //  i
+    .di_re  (su3_do_re  ),  //  i
+    .di_im  (su3_do_im  ),  //  i
+    .do_en  (su4_do_en  ),  //  o
+    .do_re  (su4_do_re  ),  //  o
+    .do_im  (su4_do_im  )   //  o
+);
+
+SdfUnit2 #(.WIDTH(WIDTH)) SU5 (
+    .clock  (clock      ),  //  i
+    .reset  (reset      ),  //  i
+    .di_en  (su4_do_en  ),  //  i
+    .di_re  (su4_do_re  ),  //  i
+    .di_im  (su4_do_im  ),  //  i
+    .do_en  (do_en      ),  //  o
+    .do_re  (do_re      ),  //  o
+    .do_im  (do_im      )   //  o
+);
+
+always @(posedge clock or posedge reset) begin
+    if (reset) begin
+        fft_cnt <= 8'd0;
+        fft_rdy <= 1'b1;
+    end else begin
+        if (do_en) begin
+            fft_cnt <= fft_cnt + 8'd1;
+            fft_rdy <= (fft_cnt == (N_FFT - 1)) ? 1'b1 : 1'b0;
+        end
+    end
+end
+
+endmodule

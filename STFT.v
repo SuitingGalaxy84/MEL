@@ -1,58 +1,98 @@
-module STFT#(
+module STFT_PW2#(
     parameter WIDTH             = 16,
-    parameter N_FFT_MAX         = $clog2(1024),
-    parameter WIN_LEN_MAX       = $clog2(1024),
-    parameter HOP_LEN_MAX       = $clog2(1024/2)
+    parameter N_FFT             = 512,
+    parameter WIN_LEN           = 480,
+    parameter HOP_LEN           = 160
 )(
     input                       clk,
     input                       rst_n,
 
     input                       lut_en, // load window coeff enable
     input                       den, // data enable, enable computation as well.
-    input [N_FFT_MAX-1:0]       n_fft,
-    input [WIN_LEN_MAX-1:0]     win_len,
-    input [HOP_LEN_MAX-1:0]     hop_len,
-    
-    input                       is_real, // 1: real input, 0: complex input
-    input                       pow2, // 1: power spectrum, 0: complex spectrum
     input [WIDTH-1:0]           win_coe, // window coeff data
     input [WIDTH-1:0]           din_re, // input data (real)
     input [WIDTH-1:0]           din_im, // input data (imag)
-    
+
     output                      data_full,
-    output reg [2*WIDTH-1:0]    stft_odata,
-    output reg                  pwd_odata_en,
-    output reg                  cpx_odata_en
+    output                      stft_data_en,
+    output [WIDTH-1:0]          stft_pw2_data
 );
-    wire win_dout_en;
-    wire fft_do_en;
+    
+    wire win_do_en;
+    reg fft_1_di_en, fft_2_di_en;
     wire [WIDTH-1:0] win_dout_re;
     wire [WIDTH-1:0] win_dout_im;
-    wire [WIDTH-1:0] fft_do_re;
-    wire [WIDTH-1:0] fft_do_im;
-    wire [WIDTH-1:0] fft_pwd_re;
-    wire [WIDTH-1:0] fft_pwd_im;
-    wire [WIDTH-1:0] fft_pwd_data = fft_pwd_re + fft_pwd_im;
-    
-    // Reset the FFT core after producing n_fft/2 + 1 outputs (one-sided output)
-    reg [N_FFT_MAX-1:0] fft_out_cnt;
-    reg reset_fft_internal;
-    wire reset_fft = (~rst_n) | reset_fft_internal;
-    wire [N_FFT_MAX-1:0] half_plus_one = (n_fft >> 1) + 1'b1;
-    
+    wire [WIDTH-1:0] fft_1_din_re;
+    wire [WIDTH-1:0] fft_1_din_im;
+    wire [WIDTH-1:0] fft_2_din_re;
+    wire [WIDTH-1:0] fft_2_din_im;
+
+    wire [WIDTH-1:0] fft_1_do_re;
+    wire [WIDTH-1:0] fft_1_do_im;
+
+    always @(*) begin
+        case({win_do_en, fft_1_rdy, fft_2_rdy})
+            3'b0xx: begin // no window output available
+                fft_1_di_en = 1'b0;
+                fft_2_di_en = 1'b0;
+
+                fft_1_din_re = {WIDTH{1'b0}};
+                fft_2_din_re = {WIDTH{1'b0}};
+                fft_2_din_im = {WIDTH{1'b0}};
+                fft_1_din_im = {WIDTH{1'b0}};
+            
+            end
+            3'b111: begin // both FFT available, prioritize FFT1
+                fft_1_di_en = 1'b1;
+                fft_2_di_en = 1'b0;
+            
+                fft_1_din_re = win_dout_re;
+                fft_1_din_im = win_dout_im;
+                fft_2_din_re = {WIDTH{1'b0}};
+                fft_2_din_im = {WIDTH{1'b0}};
+
+            end
+            3'b101: begin // only FFT2 available
+                fft_1_di_en = 1'b0;
+                fft_2_di_en = 1'b1;
+
+                fft_2_din_re = win_dout_re;
+                fft_2_din_im = win_dout_im;
+                fft_1_din_re = {WIDTH{1'b0}};
+                fft_1_din_im = {WIDTH{1'b0}};
+
+            end
+            3'b110: begin // only FFT1 available
+                fft_1_di_en = 1'b1;
+                fft_2_di_en = 1'b0;
+
+                fft_1_din_re = win_dout_re;
+                fft_1_din_im = win_dout_im;
+                fft_2_din_re = {WIDTH{1'b0}};
+                fft_2_din_im = {WIDTH{1'b0}};
+
+            end 
+            default: begin
+                fft_1_di_en = 1'b0;
+                fft_2_di_en = 1'b0;
+
+                fft_1_din_re = {WIDTH{1'b0}};
+                fft_1_din_im = {WIDTH{1'b0}};
+                fft_2_din_re = {WIDTH{1'b0}};
+                fft_2_din_im = {WIDTH{1'b0}};
+            end
+        endcase    
+    end 
     
     WIN #(
         .WIDTH          (WIDTH          ),
-        .N_FFT_MAX      (N_FFT_MAX      ),
-        .WIN_LEN_MAX    (WIN_LEN_MAX    ),
-        .HOP_LEN_MAX    (HOP_LEN_MAX    )
+        .N_FFT          (N_FFT          ),
+        .WIN_LEN        (WIN_LEN        ),
+        .HOP_LEN        (HOP_LEN        )
     ) WIN_inst (
         .clk            (clk            ),
         .rst_n          (rst_n          ),
         .den            (den            ), // data enable, enable computation as well.
-        .n_fft          (n_fft          ),
-        .win_len        (win_len        ),
-        .hop_len        (hop_len        ),
         .lut_en         (lut_en         ), // load window coeff enable
         .win_coe        (win_coe        ), // window coeff data
         .din_re         (din_re         ),
@@ -63,43 +103,49 @@ module STFT#(
         .data_full      (data_full      )
     );
 
-    FFT #(
+    // Ping-Pong FFT
+    FFT512 #(
         .WIDTH          (WIDTH          )
-    ) FFT_inst (
+    ) FFT_inst_1 (
         .clock          (clk            ),  //  Master Clock
-        .reset          (reset_fft      ),  //  Active High Asynchronous Reset (driven)
-        .di_en          (win_dout_en    ),  //  Input Data Enable
-        .di_re          (win_dout_re    ),  //  Input Data (Real)
-        .di_im          (win_dout_im    ),  //  Input Data (Imag)
-        .do_en          (fft_do_en      ),  //  Output Data Enable
-        .do_re          (fft_do_re      ),  //  Output Data (Real)
-        .do_im          (fft_do_im      )   //  Output Data (Imag)
+        .reset          (!rst_n         ),  //  Active High Asynchronous Reset (driven)
+        .di_en          (fft_1_di_en    ),  //  Input Data Enable
+        .di_re          (fft_1_din_re   ),  //  Input Data (Real)
+        .di_im          (fft_1_din_im   ),  //  Input Data (Imag)
+        .do_en          (fft_1_do_en    ),  //  Output Data Enable
+        .do_re          (fft_1_do_re    ),  //  Output Data (Real)
+        .do_im          (fft_1_do_im    ),  //  Output Data (Imag)
+        .fft_cnt        (fft_1_cnt      ),
+        .fft_rdy        (fft_1_rdy      )
     );
 
+    FFT512 #(
+        .WIDTH          (WIDTH          ),
+        .N_FFT          (N_FFT          )
+    ) FFT_inst_2 (
+        .clock          (clk            ),
+        .reset          (!rst_n         ),
+        .di_en          (fft_2_di_en    ),
+        .di_re          (fft_2_din_re   ),
+        .di_im          (fft_2_din_im   ),
+        .do_en          (fft_2_do_en    ),
+        .do_re          (fft_2_do_re    ),
+        .do_im          (fft_2_do_im    ),
+        .fft_cnt        (fft_2_cnt      ),
+        .fft_rdy        (fft_2_rdy      )
+    );
     
+    wire [WIDTH-1:0] fft_do_re = fft_1_do_en ? fft_1_do_re : (fft_2_do_en ? fft_2_do_re : {WIDTH{1'b0}});
+    wire [WIDTH-1:0] fft_do_im = fft_1_do_en ? fft_1_do_im : (fft_2_do_en ? fft_2_do_im : {WIDTH{1'b0}});
+    wire fft_do_en = fft_1_do_en | fft_2_do_en;
+    wire [WIDTH-1:0] fft_pwd_re;
+    wire [WIDTH-1:0] fft_pwd_im;
+    assign stft_data_en = fft_do_en;
+    assign stft_pw2_data = (fft_pwd_re + fft_pwd_im) > {WIDTH{1'b1}} ? {WIDTH{1'b1}} : (fft_pwd_re + fft_pwd_im);
 
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            fft_out_cnt <= {N_FFT_MAX{1'b0}};
-            reset_fft_internal <= 1'b0;
-        end else begin
-            reset_fft_internal <= 1'b0; // default
-            if (fft_do_en) begin
-                // count outputs; when we reach half_plus_one outputs, pulse reset
-                if (fft_out_cnt + 1 >= half_plus_one) begin
-                    reset_fft_internal <= 1'b1;
-                    fft_out_cnt <= {N_FFT_MAX{1'b0}};
-                end else begin
-                    fft_out_cnt <= fft_out_cnt + 1'b1;
-                end
-            end
-        end
-    end
-    
-
-
+    // Power Spectrum Calculation
     Multiply #(
-        .WIDTH          (WIDTH +1       )
+        .WIDTH          (WIDTH          )
     ) MU_inst1 (
         .a_re           (fft_do_re      ),
         .a_im           ({WIDTH{1'b0}}), // not used
@@ -110,7 +156,7 @@ module STFT#(
     );
 
     Multiply #(
-        .WIDTH          (WIDTH +1       )
+        .WIDTH          (WIDTH          )
     ) MU_inst2 (
         .a_re           (fft_do_im      ),
         .a_im           ({WIDTH{1'b0}}), // not used
@@ -120,22 +166,7 @@ module STFT#(
         .m_im           ()  // not used
     );
 
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            stft_odata          <= {2*WIDTH{1'b0}};
-            pwd_odata_en        <= 1'b0;
-            cpx_odata_en        <= 1'b0;
-        end else begin
-            if (pow2) begin
-                stft_odata      <= {{(WIDTH-1){1'b0}}, fft_pwd_data};   
-                pwd_odata_en    <= fft_do_en;
-                cpx_odata_en    <= 1'b0;
-            end else begin
-                stft_odata      <= {fft_do_re, fft_do_im};
-                pwd_odata_en    <= 1'b0;    
-                cpx_odata_en    <= fft_do_en;
-            end
-        end
-    end 
+    // Output Selection
+    
 
 endmodule

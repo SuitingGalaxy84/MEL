@@ -1,4 +1,4 @@
-module WIN#(
+module WIN_LUT#(
     parameter WIDTH             = 16,
     parameter N_FFT             = 512,
     parameter WIN_LEN           = 480,
@@ -11,8 +11,6 @@ module WIN#(
     input                       clk,
     input                       rst_n,
     input                       den, // data enable, enable computation as well.
-    input                       lut_en, // load window coeff enable
-    input [WIDTH-1:0]           win_coe, // window coeff data
     input [WIDTH-1:0]           din_re,
     input [WIDTH-1:0]           din_im,
     output                      dout_en,
@@ -80,21 +78,8 @@ module WIN#(
         .dout               (data_mu_in     )
     );
 
-
-    SRAM #(
-        .DATA_WIDTH         (WIDTH      ),
-        .ADDR_WIDTH         (WIN_LEN    )
-    ) WIN_COE_RE_LUT (
-        .clk                (clk            ),
-        .rstn               (rst_n          ),
-        .cs                 (1'b1           ), // to be determined
-        .we                 (win_coe_we     ), // load coefficient when lut_en is high
-        .r_addr             (r_coe_ptr[WIN_LEN_WIDTH-1:0]),
-        .w_addr             (w_coe_ptr      ),
-        .din                (win_coe        ),
-        .dout               (coe_mu_in      )
-    );
     
+
 
     // --- MU Output Wires ---
     wire [WIDTH-1:0] data_mu_re;
