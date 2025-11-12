@@ -1,0 +1,512 @@
+assign wn_re[  0] = 16'h7FFF;    assign wn_im[  0] = 16'h0000;   // 0  1.000 -0.000
+assign wn_re[  1] = 16'h7FFC;    assign wn_im[  1] = 16'hFE6E;   // 1  1.000 -0.012
+assign wn_re[  2] = 16'h7FF5;    assign wn_im[  2] = 16'hFCDC;   // 2  1.000 -0.025
+assign wn_re[  3] = 16'h7FE8;    assign wn_im[  3] = 16'hFB4A;   // 3  0.999 -0.037
+assign wn_re[  4] = 16'h7FD7;    assign wn_im[  4] = 16'hF9B9;   // 4  0.999 -0.049
+assign wn_re[  5] = 16'h7FC1;    assign wn_im[  5] = 16'hF827;   // 5  0.998 -0.061
+assign wn_re[  6] = 16'h7FA6;    assign wn_im[  6] = 16'hF696;   // 6  0.997 -0.074
+assign wn_re[  7] = 16'h7F86;    assign wn_im[  7] = 16'hF505;   // 7  0.996 -0.086
+assign wn_re[  8] = 16'h7F61;    assign wn_im[  8] = 16'hF375;   // 8  0.995 -0.098
+assign wn_re[  9] = 16'h7F37;    assign wn_im[  9] = 16'hF1E5;   // 9  0.994 -0.110
+assign wn_re[ 10] = 16'h7F08;    assign wn_im[ 10] = 16'hF055;   // 10  0.992 -0.122
+assign wn_re[ 11] = 16'h7ED4;    assign wn_im[ 11] = 16'hEEC7;   // 11  0.991 -0.135
+assign wn_re[ 12] = 16'h7E9C;    assign wn_im[ 12] = 16'hED39;   // 12  0.989 -0.147
+assign wn_re[ 13] = 16'h7E5E;    assign wn_im[ 13] = 16'hEBAB;   // 13  0.987 -0.159
+assign wn_re[ 14] = 16'h7E1C;    assign wn_im[ 14] = 16'hEA1F;   // 14  0.985 -0.171
+assign wn_re[ 15] = 16'h7DD5;    assign wn_im[ 15] = 16'hE893;   // 15  0.983 -0.183
+assign wn_re[ 16] = 16'h7D89;    assign wn_im[ 16] = 16'hE708;   // 16  0.981 -0.195
+assign wn_re[ 17] = 16'h7D38;    assign wn_im[ 17] = 16'hE57E;   // 17  0.978 -0.207
+assign wn_re[ 18] = 16'h7CE2;    assign wn_im[ 18] = 16'hE3F5;   // 18  0.976 -0.219
+assign wn_re[ 19] = 16'h7C88;    assign wn_im[ 19] = 16'hE26D;   // 19  0.973 -0.231
+assign wn_re[ 20] = 16'h7C29;    assign wn_im[ 20] = 16'hE0E7;   // 20  0.970 -0.243
+assign wn_re[ 21] = 16'h7BC4;    assign wn_im[ 21] = 16'hDF61;   // 21  0.967 -0.255
+assign wn_re[ 22] = 16'h7B5C;    assign wn_im[ 22] = 16'hDDDD;   // 22  0.964 -0.267
+assign wn_re[ 23] = 16'h7AEE;    assign wn_im[ 23] = 16'hDC5A;   // 23  0.960 -0.279
+assign wn_re[ 24] = 16'h7A7C;    assign wn_im[ 24] = 16'hDAD9;   // 24  0.957 -0.290
+assign wn_re[ 25] = 16'h7A04;    assign wn_im[ 25] = 16'hD959;   // 25  0.953 -0.302
+assign wn_re[ 26] = 16'h7989;    assign wn_im[ 26] = 16'hD7DA;   // 26  0.950 -0.314
+assign wn_re[ 27] = 16'h7908;    assign wn_im[ 27] = 16'hD65D;   // 27  0.946 -0.325
+assign wn_re[ 28] = 16'h7883;    assign wn_im[ 28] = 16'hD4E2;   // 28  0.942 -0.337
+assign wn_re[ 29] = 16'h77F9;    assign wn_im[ 29] = 16'hD368;   // 29  0.937 -0.348
+assign wn_re[ 30] = 16'h776B;    assign wn_im[ 30] = 16'hD1F0;   // 30  0.933 -0.360
+assign wn_re[ 31] = 16'h76D8;    assign wn_im[ 31] = 16'hD07A;   // 31  0.929 -0.371
+assign wn_re[ 32] = 16'h7640;    assign wn_im[ 32] = 16'hCF05;   // 32  0.924 -0.383
+assign wn_re[ 33] = 16'h75A4;    assign wn_im[ 33] = 16'hCD93;   // 33  0.919 -0.394
+assign wn_re[ 34] = 16'h7503;    assign wn_im[ 34] = 16'hCC22;   // 34  0.914 -0.405
+assign wn_re[ 35] = 16'h745E;    assign wn_im[ 35] = 16'hCAB3;   // 35  0.909 -0.416
+assign wn_re[ 36] = 16'h73B5;    assign wn_im[ 36] = 16'hC947;   // 36  0.904 -0.428
+assign wn_re[ 37] = 16'h7306;    assign wn_im[ 37] = 16'hC7DC;   // 37  0.899 -0.439
+assign wn_re[ 38] = 16'h7254;    assign wn_im[ 38] = 16'hC674;   // 38  0.893 -0.450
+assign wn_re[ 39] = 16'h719D;    assign wn_im[ 39] = 16'hC50E;   // 39  0.888 -0.461
+assign wn_re[ 40] = 16'h70E1;    assign wn_im[ 40] = 16'hC3AA;   // 40  0.882 -0.471
+assign wn_re[ 41] = 16'h7022;    assign wn_im[ 41] = 16'hC249;   // 41  0.876 -0.482
+assign wn_re[ 42] = 16'h6F5E;    assign wn_im[ 42] = 16'hC0EA;   // 42  0.870 -0.493
+assign wn_re[ 43] = 16'h6E95;    assign wn_im[ 43] = 16'hBF8D;   // 43  0.864 -0.504
+assign wn_re[ 44] = 16'h6DC9;    assign wn_im[ 44] = 16'hBE33;   // 44  0.858 -0.514
+assign wn_re[ 45] = 16'h6CF8;    assign wn_im[ 45] = 16'hBCDB;   // 45  0.851 -0.525
+assign wn_re[ 46] = 16'h6C23;    assign wn_im[ 46] = 16'hBB86;   // 46  0.845 -0.535
+assign wn_re[ 47] = 16'h6B4A;    assign wn_im[ 47] = 16'hBA34;   // 47  0.838 -0.545
+assign wn_re[ 48] = 16'h6A6C;    assign wn_im[ 48] = 16'hB8E4;   // 48  0.831 -0.556
+assign wn_re[ 49] = 16'h698B;    assign wn_im[ 49] = 16'hB797;   // 49  0.825 -0.566
+assign wn_re[ 50] = 16'h68A5;    assign wn_im[ 50] = 16'hB64D;   // 50  0.818 -0.576
+assign wn_re[ 51] = 16'h67BC;    assign wn_im[ 51] = 16'hB506;   // 51  0.810 -0.586
+assign wn_re[ 52] = 16'h66CE;    assign wn_im[ 52] = 16'hB3C1;   // 52  0.803 -0.596
+assign wn_re[ 53] = 16'h65DD;    assign wn_im[ 53] = 16'hB280;   // 53  0.796 -0.606
+assign wn_re[ 54] = 16'h64E7;    assign wn_im[ 54] = 16'hB141;   // 54  0.788 -0.615
+assign wn_re[ 55] = 16'h63EE;    assign wn_im[ 55] = 16'hB006;   // 55  0.781 -0.625
+assign wn_re[ 56] = 16'h62F1;    assign wn_im[ 56] = 16'hAECD;   // 56  0.773 -0.634
+assign wn_re[ 57] = 16'h61F0;    assign wn_im[ 57] = 16'hAD98;   // 57  0.765 -0.644
+assign wn_re[ 58] = 16'h60EB;    assign wn_im[ 58] = 16'hAC66;   // 58  0.757 -0.653
+assign wn_re[ 59] = 16'h5FE2;    assign wn_im[ 59] = 16'hAB37;   // 59  0.749 -0.662
+assign wn_re[ 60] = 16'h5ED6;    assign wn_im[ 60] = 16'hAA0C;   // 60  0.741 -0.672
+assign wn_re[ 61] = 16'h5DC6;    assign wn_im[ 61] = 16'hA8E3;   // 61  0.733 -0.681
+assign wn_re[ 62] = 16'h5CB3;    assign wn_im[ 62] = 16'hA7BE;   // 62  0.724 -0.690
+assign wn_re[ 63] = 16'h5B9C;    assign wn_im[ 63] = 16'hA69D;   // 63  0.716 -0.698
+assign wn_re[ 64] = 16'h5A81;    assign wn_im[ 64] = 16'hA57F;   // 64  0.707 -0.707
+assign wn_re[ 65] = 16'h5963;    assign wn_im[ 65] = 16'hA464;   // 65  0.698 -0.716
+assign wn_re[ 66] = 16'h5842;    assign wn_im[ 66] = 16'hA34D;   // 66  0.690 -0.724
+assign wn_re[ 67] = 16'h571D;    assign wn_im[ 67] = 16'hA23A;   // 67  0.681 -0.733
+assign wn_re[ 68] = 16'h55F4;    assign wn_im[ 68] = 16'hA12A;   // 68  0.672 -0.741
+assign wn_re[ 69] = 16'h54C9;    assign wn_im[ 69] = 16'hA01E;   // 69  0.662 -0.749
+assign wn_re[ 70] = 16'h539A;    assign wn_im[ 70] = 16'h9F15;   // 70  0.653 -0.757
+assign wn_re[ 71] = 16'h5268;    assign wn_im[ 71] = 16'h9E10;   // 71  0.644 -0.765
+assign wn_re[ 72] = 16'h5133;    assign wn_im[ 72] = 16'h9D0F;   // 72  0.634 -0.773
+assign wn_re[ 73] = 16'h4FFA;    assign wn_im[ 73] = 16'h9C12;   // 73  0.625 -0.781
+assign wn_re[ 74] = 16'h4EBF;    assign wn_im[ 74] = 16'h9B19;   // 74  0.615 -0.788
+assign wn_re[ 75] = 16'h4D80;    assign wn_im[ 75] = 16'h9A23;   // 75  0.606 -0.796
+assign wn_re[ 76] = 16'h4C3F;    assign wn_im[ 76] = 16'h9932;   // 76  0.596 -0.803
+assign wn_re[ 77] = 16'h4AFA;    assign wn_im[ 77] = 16'h9844;   // 77  0.586 -0.810
+assign wn_re[ 78] = 16'h49B3;    assign wn_im[ 78] = 16'h975B;   // 78  0.576 -0.818
+assign wn_re[ 79] = 16'h4869;    assign wn_im[ 79] = 16'h9675;   // 79  0.566 -0.825
+assign wn_re[ 80] = 16'h471C;    assign wn_im[ 80] = 16'h9594;   // 80  0.556 -0.831
+assign wn_re[ 81] = 16'h45CC;    assign wn_im[ 81] = 16'h94B6;   // 81  0.545 -0.838
+assign wn_re[ 82] = 16'h447A;    assign wn_im[ 82] = 16'h93DD;   // 82  0.535 -0.845
+assign wn_re[ 83] = 16'h4325;    assign wn_im[ 83] = 16'h9308;   // 83  0.525 -0.851
+assign wn_re[ 84] = 16'h41CD;    assign wn_im[ 84] = 16'h9237;   // 84  0.514 -0.858
+assign wn_re[ 85] = 16'h4073;    assign wn_im[ 85] = 16'h916B;   // 85  0.504 -0.864
+assign wn_re[ 86] = 16'h3F16;    assign wn_im[ 86] = 16'h90A2;   // 86  0.493 -0.870
+assign wn_re[ 87] = 16'h3DB7;    assign wn_im[ 87] = 16'h8FDE;   // 87  0.482 -0.876
+assign wn_re[ 88] = 16'h3C56;    assign wn_im[ 88] = 16'h8F1F;   // 88  0.471 -0.882
+assign wn_re[ 89] = 16'h3AF2;    assign wn_im[ 89] = 16'h8E63;   // 89  0.461 -0.888
+assign wn_re[ 90] = 16'h398C;    assign wn_im[ 90] = 16'h8DAC;   // 90  0.450 -0.893
+assign wn_re[ 91] = 16'h3824;    assign wn_im[ 91] = 16'h8CFA;   // 91  0.439 -0.899
+assign wn_re[ 92] = 16'h36B9;    assign wn_im[ 92] = 16'h8C4B;   // 92  0.428 -0.904
+assign wn_re[ 93] = 16'h354D;    assign wn_im[ 93] = 16'h8BA2;   // 93  0.416 -0.909
+assign wn_re[ 94] = 16'h33DE;    assign wn_im[ 94] = 16'h8AFD;   // 94  0.405 -0.914
+assign wn_re[ 95] = 16'h326D;    assign wn_im[ 95] = 16'h8A5C;   // 95  0.394 -0.919
+assign wn_re[ 96] = 16'h30FB;    assign wn_im[ 96] = 16'h89C0;   // 96  0.383 -0.924
+assign wn_re[ 97] = 16'h2F86;    assign wn_im[ 97] = 16'h8928;   // 97  0.371 -0.929
+assign wn_re[ 98] = 16'h2E10;    assign wn_im[ 98] = 16'h8895;   // 98  0.360 -0.933
+assign wn_re[ 99] = 16'h2C98;    assign wn_im[ 99] = 16'h8807;   // 99  0.348 -0.937
+assign wn_re[100] = 16'h2B1E;    assign wn_im[100] = 16'h877D;   // 100  0.337 -0.942
+assign wn_re[101] = 16'h29A3;    assign wn_im[101] = 16'h86F8;   // 101  0.325 -0.946
+assign wn_re[102] = 16'h2826;    assign wn_im[102] = 16'h8677;   // 102  0.314 -0.950
+assign wn_re[103] = 16'h26A7;    assign wn_im[103] = 16'h85FC;   // 103  0.302 -0.953
+assign wn_re[104] = 16'h2527;    assign wn_im[104] = 16'h8584;   // 104  0.290 -0.957
+assign wn_re[105] = 16'h23A6;    assign wn_im[105] = 16'h8512;   // 105  0.279 -0.960
+assign wn_re[106] = 16'h2223;    assign wn_im[106] = 16'h84A4;   // 106  0.267 -0.964
+assign wn_re[107] = 16'h209F;    assign wn_im[107] = 16'h843C;   // 107  0.255 -0.967
+assign wn_re[108] = 16'h1F19;    assign wn_im[108] = 16'h83D7;   // 108  0.243 -0.970
+assign wn_re[109] = 16'h1D93;    assign wn_im[109] = 16'h8378;   // 109  0.231 -0.973
+assign wn_re[110] = 16'h1C0B;    assign wn_im[110] = 16'h831E;   // 110  0.219 -0.976
+assign wn_re[111] = 16'h1A82;    assign wn_im[111] = 16'h82C8;   // 111  0.207 -0.978
+assign wn_re[112] = 16'h18F8;    assign wn_im[112] = 16'h8277;   // 112  0.195 -0.981
+assign wn_re[113] = 16'h176D;    assign wn_im[113] = 16'h822B;   // 113  0.183 -0.983
+assign wn_re[114] = 16'h15E1;    assign wn_im[114] = 16'h81E4;   // 114  0.171 -0.985
+assign wn_re[115] = 16'h1455;    assign wn_im[115] = 16'h81A2;   // 115  0.159 -0.987
+assign wn_re[116] = 16'h12C7;    assign wn_im[116] = 16'h8164;   // 116  0.147 -0.989
+assign wn_re[117] = 16'h1139;    assign wn_im[117] = 16'h812C;   // 117  0.135 -0.991
+assign wn_re[118] = 16'h0FAB;    assign wn_im[118] = 16'h80F8;   // 118  0.122 -0.992
+assign wn_re[119] = 16'h0E1B;    assign wn_im[119] = 16'h80C9;   // 119  0.110 -0.994
+assign wn_re[120] = 16'h0C8B;    assign wn_im[120] = 16'h809F;   // 120  0.098 -0.995
+assign wn_re[121] = 16'h0AFB;    assign wn_im[121] = 16'h807A;   // 121  0.086 -0.996
+assign wn_re[122] = 16'h096A;    assign wn_im[122] = 16'h805A;   // 122  0.074 -0.997
+assign wn_re[123] = 16'h07D9;    assign wn_im[123] = 16'h803F;   // 123  0.061 -0.998
+assign wn_re[124] = 16'h0647;    assign wn_im[124] = 16'h8029;   // 124  0.049 -0.999
+assign wn_re[125] = 16'h04B6;    assign wn_im[125] = 16'h8018;   // 125  0.037 -0.999
+assign wn_re[126] = 16'h0324;    assign wn_im[126] = 16'h800B;   // 126  0.025 -1.000
+assign wn_re[127] = 16'h0192;    assign wn_im[127] = 16'h8004;   // 127  0.012 -1.000
+assign wn_re[128] = 16'h0000;    assign wn_im[128] = 16'h8001;   // 128  0.000 -1.000
+assign wn_re[129] = 16'hFE6E;    assign wn_im[129] = 16'h8004;   // 129 -0.012 -1.000
+assign wn_re[130] = 16'hFCDC;    assign wn_im[130] = 16'h800B;   // 130 -0.025 -1.000
+assign wn_re[131] = 16'hFB4A;    assign wn_im[131] = 16'h8018;   // 131 -0.037 -0.999
+assign wn_re[132] = 16'hF9B9;    assign wn_im[132] = 16'h8029;   // 132 -0.049 -0.999
+assign wn_re[133] = 16'hF827;    assign wn_im[133] = 16'h803F;   // 133 -0.061 -0.998
+assign wn_re[134] = 16'hF696;    assign wn_im[134] = 16'h805A;   // 134 -0.074 -0.997
+assign wn_re[135] = 16'hF505;    assign wn_im[135] = 16'h807A;   // 135 -0.086 -0.996
+assign wn_re[136] = 16'hF375;    assign wn_im[136] = 16'h809F;   // 136 -0.098 -0.995
+assign wn_re[137] = 16'hF1E5;    assign wn_im[137] = 16'h80C9;   // 137 -0.110 -0.994
+assign wn_re[138] = 16'hF055;    assign wn_im[138] = 16'h80F8;   // 138 -0.122 -0.992
+assign wn_re[139] = 16'hEEC7;    assign wn_im[139] = 16'h812C;   // 139 -0.135 -0.991
+assign wn_re[140] = 16'hED39;    assign wn_im[140] = 16'h8164;   // 140 -0.147 -0.989
+assign wn_re[141] = 16'hEBAB;    assign wn_im[141] = 16'h81A2;   // 141 -0.159 -0.987
+assign wn_re[142] = 16'hEA1F;    assign wn_im[142] = 16'h81E4;   // 142 -0.171 -0.985
+assign wn_re[143] = 16'hE893;    assign wn_im[143] = 16'h822B;   // 143 -0.183 -0.983
+assign wn_re[144] = 16'hE708;    assign wn_im[144] = 16'h8277;   // 144 -0.195 -0.981
+assign wn_re[145] = 16'hE57E;    assign wn_im[145] = 16'h82C8;   // 145 -0.207 -0.978
+assign wn_re[146] = 16'hE3F5;    assign wn_im[146] = 16'h831E;   // 146 -0.219 -0.976
+assign wn_re[147] = 16'hE26D;    assign wn_im[147] = 16'h8378;   // 147 -0.231 -0.973
+assign wn_re[148] = 16'hE0E7;    assign wn_im[148] = 16'h83D7;   // 148 -0.243 -0.970
+assign wn_re[149] = 16'hDF61;    assign wn_im[149] = 16'h843C;   // 149 -0.255 -0.967
+assign wn_re[150] = 16'hDDDD;    assign wn_im[150] = 16'h84A4;   // 150 -0.267 -0.964
+assign wn_re[151] = 16'hDC5A;    assign wn_im[151] = 16'h8512;   // 151 -0.279 -0.960
+assign wn_re[152] = 16'hDAD9;    assign wn_im[152] = 16'h8584;   // 152 -0.290 -0.957
+assign wn_re[153] = 16'hD959;    assign wn_im[153] = 16'h85FC;   // 153 -0.302 -0.953
+assign wn_re[154] = 16'hD7DA;    assign wn_im[154] = 16'h8677;   // 154 -0.314 -0.950
+assign wn_re[155] = 16'hD65D;    assign wn_im[155] = 16'h86F8;   // 155 -0.325 -0.946
+assign wn_re[156] = 16'hD4E2;    assign wn_im[156] = 16'h877D;   // 156 -0.337 -0.942
+assign wn_re[157] = 16'hD368;    assign wn_im[157] = 16'h8807;   // 157 -0.348 -0.937
+assign wn_re[158] = 16'hD1F0;    assign wn_im[158] = 16'h8895;   // 158 -0.360 -0.933
+assign wn_re[159] = 16'hD07A;    assign wn_im[159] = 16'h8928;   // 159 -0.371 -0.929
+assign wn_re[160] = 16'hCF05;    assign wn_im[160] = 16'h89C0;   // 160 -0.383 -0.924
+assign wn_re[161] = 16'hCD93;    assign wn_im[161] = 16'h8A5C;   // 161 -0.394 -0.919
+assign wn_re[162] = 16'hCC22;    assign wn_im[162] = 16'h8AFD;   // 162 -0.405 -0.914
+assign wn_re[163] = 16'hCAB3;    assign wn_im[163] = 16'h8BA2;   // 163 -0.416 -0.909
+assign wn_re[164] = 16'hC947;    assign wn_im[164] = 16'h8C4B;   // 164 -0.428 -0.904
+assign wn_re[165] = 16'hC7DC;    assign wn_im[165] = 16'h8CFA;   // 165 -0.439 -0.899
+assign wn_re[166] = 16'hC674;    assign wn_im[166] = 16'h8DAC;   // 166 -0.450 -0.893
+assign wn_re[167] = 16'hC50E;    assign wn_im[167] = 16'h8E63;   // 167 -0.461 -0.888
+assign wn_re[168] = 16'hC3AA;    assign wn_im[168] = 16'h8F1F;   // 168 -0.471 -0.882
+assign wn_re[169] = 16'hC249;    assign wn_im[169] = 16'h8FDE;   // 169 -0.482 -0.876
+assign wn_re[170] = 16'hC0EA;    assign wn_im[170] = 16'h90A2;   // 170 -0.493 -0.870
+assign wn_re[171] = 16'hBF8D;    assign wn_im[171] = 16'h916B;   // 171 -0.504 -0.864
+assign wn_re[172] = 16'hBE33;    assign wn_im[172] = 16'h9237;   // 172 -0.514 -0.858
+assign wn_re[173] = 16'hBCDB;    assign wn_im[173] = 16'h9308;   // 173 -0.525 -0.851
+assign wn_re[174] = 16'hBB86;    assign wn_im[174] = 16'h93DD;   // 174 -0.535 -0.845
+assign wn_re[175] = 16'hBA34;    assign wn_im[175] = 16'h94B6;   // 175 -0.545 -0.838
+assign wn_re[176] = 16'hB8E4;    assign wn_im[176] = 16'h9594;   // 176 -0.556 -0.831
+assign wn_re[177] = 16'hB797;    assign wn_im[177] = 16'h9675;   // 177 -0.566 -0.825
+assign wn_re[178] = 16'hB64D;    assign wn_im[178] = 16'h975B;   // 178 -0.576 -0.818
+assign wn_re[179] = 16'hB506;    assign wn_im[179] = 16'h9844;   // 179 -0.586 -0.810
+assign wn_re[180] = 16'hB3C1;    assign wn_im[180] = 16'h9932;   // 180 -0.596 -0.803
+assign wn_re[181] = 16'hB280;    assign wn_im[181] = 16'h9A23;   // 181 -0.606 -0.796
+assign wn_re[182] = 16'hB141;    assign wn_im[182] = 16'h9B19;   // 182 -0.615 -0.788
+assign wn_re[183] = 16'hB006;    assign wn_im[183] = 16'h9C12;   // 183 -0.625 -0.781
+assign wn_re[184] = 16'hAECD;    assign wn_im[184] = 16'h9D0F;   // 184 -0.634 -0.773
+assign wn_re[185] = 16'hAD98;    assign wn_im[185] = 16'h9E10;   // 185 -0.644 -0.765
+assign wn_re[186] = 16'hAC66;    assign wn_im[186] = 16'h9F15;   // 186 -0.653 -0.757
+assign wn_re[187] = 16'hAB37;    assign wn_im[187] = 16'hA01E;   // 187 -0.662 -0.749
+assign wn_re[188] = 16'hAA0C;    assign wn_im[188] = 16'hA12A;   // 188 -0.672 -0.741
+assign wn_re[189] = 16'hA8E3;    assign wn_im[189] = 16'hA23A;   // 189 -0.681 -0.733
+assign wn_re[190] = 16'hA7BE;    assign wn_im[190] = 16'hA34D;   // 190 -0.690 -0.724
+assign wn_re[191] = 16'hA69D;    assign wn_im[191] = 16'hA464;   // 191 -0.698 -0.716
+assign wn_re[192] = 16'hA57F;    assign wn_im[192] = 16'hA57F;   // 192 -0.707 -0.707
+assign wn_re[193] = 16'hA464;    assign wn_im[193] = 16'hA69D;   // 193 -0.716 -0.698
+assign wn_re[194] = 16'hA34D;    assign wn_im[194] = 16'hA7BE;   // 194 -0.724 -0.690
+assign wn_re[195] = 16'hA23A;    assign wn_im[195] = 16'hA8E3;   // 195 -0.733 -0.681
+assign wn_re[196] = 16'hA12A;    assign wn_im[196] = 16'hAA0C;   // 196 -0.741 -0.672
+assign wn_re[197] = 16'hA01E;    assign wn_im[197] = 16'hAB37;   // 197 -0.749 -0.662
+assign wn_re[198] = 16'h9F15;    assign wn_im[198] = 16'hAC66;   // 198 -0.757 -0.653
+assign wn_re[199] = 16'h9E10;    assign wn_im[199] = 16'hAD98;   // 199 -0.765 -0.644
+assign wn_re[200] = 16'h9D0F;    assign wn_im[200] = 16'hAECD;   // 200 -0.773 -0.634
+assign wn_re[201] = 16'h9C12;    assign wn_im[201] = 16'hB006;   // 201 -0.781 -0.625
+assign wn_re[202] = 16'h9B19;    assign wn_im[202] = 16'hB141;   // 202 -0.788 -0.615
+assign wn_re[203] = 16'h9A23;    assign wn_im[203] = 16'hB280;   // 203 -0.796 -0.606
+assign wn_re[204] = 16'h9932;    assign wn_im[204] = 16'hB3C1;   // 204 -0.803 -0.596
+assign wn_re[205] = 16'h9844;    assign wn_im[205] = 16'hB506;   // 205 -0.810 -0.586
+assign wn_re[206] = 16'h975B;    assign wn_im[206] = 16'hB64D;   // 206 -0.818 -0.576
+assign wn_re[207] = 16'h9675;    assign wn_im[207] = 16'hB797;   // 207 -0.825 -0.566
+assign wn_re[208] = 16'h9594;    assign wn_im[208] = 16'hB8E4;   // 208 -0.831 -0.556
+assign wn_re[209] = 16'h94B6;    assign wn_im[209] = 16'hBA34;   // 209 -0.838 -0.545
+assign wn_re[210] = 16'h93DD;    assign wn_im[210] = 16'hBB86;   // 210 -0.845 -0.535
+assign wn_re[211] = 16'h9308;    assign wn_im[211] = 16'hBCDB;   // 211 -0.851 -0.525
+assign wn_re[212] = 16'h9237;    assign wn_im[212] = 16'hBE33;   // 212 -0.858 -0.514
+assign wn_re[213] = 16'h916B;    assign wn_im[213] = 16'hBF8D;   // 213 -0.864 -0.504
+assign wn_re[214] = 16'h90A2;    assign wn_im[214] = 16'hC0EA;   // 214 -0.870 -0.493
+assign wn_re[215] = 16'h8FDE;    assign wn_im[215] = 16'hC249;   // 215 -0.876 -0.482
+assign wn_re[216] = 16'h8F1F;    assign wn_im[216] = 16'hC3AA;   // 216 -0.882 -0.471
+assign wn_re[217] = 16'h8E63;    assign wn_im[217] = 16'hC50E;   // 217 -0.888 -0.461
+assign wn_re[218] = 16'h8DAC;    assign wn_im[218] = 16'hC674;   // 218 -0.893 -0.450
+assign wn_re[219] = 16'h8CFA;    assign wn_im[219] = 16'hC7DC;   // 219 -0.899 -0.439
+assign wn_re[220] = 16'h8C4B;    assign wn_im[220] = 16'hC947;   // 220 -0.904 -0.428
+assign wn_re[221] = 16'h8BA2;    assign wn_im[221] = 16'hCAB3;   // 221 -0.909 -0.416
+assign wn_re[222] = 16'h8AFD;    assign wn_im[222] = 16'hCC22;   // 222 -0.914 -0.405
+assign wn_re[223] = 16'h8A5C;    assign wn_im[223] = 16'hCD93;   // 223 -0.919 -0.394
+assign wn_re[224] = 16'h89C0;    assign wn_im[224] = 16'hCF05;   // 224 -0.924 -0.383
+assign wn_re[225] = 16'h8928;    assign wn_im[225] = 16'hD07A;   // 225 -0.929 -0.371
+assign wn_re[226] = 16'h8895;    assign wn_im[226] = 16'hD1F0;   // 226 -0.933 -0.360
+assign wn_re[227] = 16'h8807;    assign wn_im[227] = 16'hD368;   // 227 -0.937 -0.348
+assign wn_re[228] = 16'h877D;    assign wn_im[228] = 16'hD4E2;   // 228 -0.942 -0.337
+assign wn_re[229] = 16'h86F8;    assign wn_im[229] = 16'hD65D;   // 229 -0.946 -0.325
+assign wn_re[230] = 16'h8677;    assign wn_im[230] = 16'hD7DA;   // 230 -0.950 -0.314
+assign wn_re[231] = 16'h85FC;    assign wn_im[231] = 16'hD959;   // 231 -0.953 -0.302
+assign wn_re[232] = 16'h8584;    assign wn_im[232] = 16'hDAD9;   // 232 -0.957 -0.290
+assign wn_re[233] = 16'h8512;    assign wn_im[233] = 16'hDC5A;   // 233 -0.960 -0.279
+assign wn_re[234] = 16'h84A4;    assign wn_im[234] = 16'hDDDD;   // 234 -0.964 -0.267
+assign wn_re[235] = 16'h843C;    assign wn_im[235] = 16'hDF61;   // 235 -0.967 -0.255
+assign wn_re[236] = 16'h83D7;    assign wn_im[236] = 16'hE0E7;   // 236 -0.970 -0.243
+assign wn_re[237] = 16'h8378;    assign wn_im[237] = 16'hE26D;   // 237 -0.973 -0.231
+assign wn_re[238] = 16'h831E;    assign wn_im[238] = 16'hE3F5;   // 238 -0.976 -0.219
+assign wn_re[239] = 16'h82C8;    assign wn_im[239] = 16'hE57E;   // 239 -0.978 -0.207
+assign wn_re[240] = 16'h8277;    assign wn_im[240] = 16'hE708;   // 240 -0.981 -0.195
+assign wn_re[241] = 16'h822B;    assign wn_im[241] = 16'hE893;   // 241 -0.983 -0.183
+assign wn_re[242] = 16'h81E4;    assign wn_im[242] = 16'hEA1F;   // 242 -0.985 -0.171
+assign wn_re[243] = 16'h81A2;    assign wn_im[243] = 16'hEBAB;   // 243 -0.987 -0.159
+assign wn_re[244] = 16'h8164;    assign wn_im[244] = 16'hED39;   // 244 -0.989 -0.147
+assign wn_re[245] = 16'h812C;    assign wn_im[245] = 16'hEEC7;   // 245 -0.991 -0.135
+assign wn_re[246] = 16'h80F8;    assign wn_im[246] = 16'hF055;   // 246 -0.992 -0.122
+assign wn_re[247] = 16'h80C9;    assign wn_im[247] = 16'hF1E5;   // 247 -0.994 -0.110
+assign wn_re[248] = 16'h809F;    assign wn_im[248] = 16'hF375;   // 248 -0.995 -0.098
+assign wn_re[249] = 16'h807A;    assign wn_im[249] = 16'hF505;   // 249 -0.996 -0.086
+assign wn_re[250] = 16'h805A;    assign wn_im[250] = 16'hF696;   // 250 -0.997 -0.074
+assign wn_re[251] = 16'h803F;    assign wn_im[251] = 16'hF827;   // 251 -0.998 -0.061
+assign wn_re[252] = 16'h8029;    assign wn_im[252] = 16'hF9B9;   // 252 -0.999 -0.049
+assign wn_re[253] = 16'h8018;    assign wn_im[253] = 16'hFB4A;   // 253 -0.999 -0.037
+assign wn_re[254] = 16'h800B;    assign wn_im[254] = 16'hFCDC;   // 254 -1.000 -0.025
+assign wn_re[255] = 16'h8004;    assign wn_im[255] = 16'hFE6E;   // 255 -1.000 -0.012
+assign wn_re[256] = 16'h8001;    assign wn_im[256] = 16'h0000;   // 256 -1.000 -0.000
+assign wn_re[257] = 16'h8004;    assign wn_im[257] = 16'h0192;   // 257 -1.000  0.012
+assign wn_re[258] = 16'h800B;    assign wn_im[258] = 16'h0324;   // 258 -1.000  0.025
+assign wn_re[259] = 16'h8018;    assign wn_im[259] = 16'h04B6;   // 259 -0.999  0.037
+assign wn_re[260] = 16'h8029;    assign wn_im[260] = 16'h0647;   // 260 -0.999  0.049
+assign wn_re[261] = 16'h803F;    assign wn_im[261] = 16'h07D9;   // 261 -0.998  0.061
+assign wn_re[262] = 16'h805A;    assign wn_im[262] = 16'h096A;   // 262 -0.997  0.074
+assign wn_re[263] = 16'h807A;    assign wn_im[263] = 16'h0AFB;   // 263 -0.996  0.086
+assign wn_re[264] = 16'h809F;    assign wn_im[264] = 16'h0C8B;   // 264 -0.995  0.098
+assign wn_re[265] = 16'h80C9;    assign wn_im[265] = 16'h0E1B;   // 265 -0.994  0.110
+assign wn_re[266] = 16'h80F8;    assign wn_im[266] = 16'h0FAB;   // 266 -0.992  0.122
+assign wn_re[267] = 16'h812C;    assign wn_im[267] = 16'h1139;   // 267 -0.991  0.135
+assign wn_re[268] = 16'h8164;    assign wn_im[268] = 16'h12C7;   // 268 -0.989  0.147
+assign wn_re[269] = 16'h81A2;    assign wn_im[269] = 16'h1455;   // 269 -0.987  0.159
+assign wn_re[270] = 16'h81E4;    assign wn_im[270] = 16'h15E1;   // 270 -0.985  0.171
+assign wn_re[271] = 16'h822B;    assign wn_im[271] = 16'h176D;   // 271 -0.983  0.183
+assign wn_re[272] = 16'h8277;    assign wn_im[272] = 16'h18F8;   // 272 -0.981  0.195
+assign wn_re[273] = 16'h82C8;    assign wn_im[273] = 16'h1A82;   // 273 -0.978  0.207
+assign wn_re[274] = 16'h831E;    assign wn_im[274] = 16'h1C0B;   // 274 -0.976  0.219
+assign wn_re[275] = 16'h8378;    assign wn_im[275] = 16'h1D93;   // 275 -0.973  0.231
+assign wn_re[276] = 16'h83D7;    assign wn_im[276] = 16'h1F19;   // 276 -0.970  0.243
+assign wn_re[277] = 16'h843C;    assign wn_im[277] = 16'h209F;   // 277 -0.967  0.255
+assign wn_re[278] = 16'h84A4;    assign wn_im[278] = 16'h2223;   // 278 -0.964  0.267
+assign wn_re[279] = 16'h8512;    assign wn_im[279] = 16'h23A6;   // 279 -0.960  0.279
+assign wn_re[280] = 16'h8584;    assign wn_im[280] = 16'h2527;   // 280 -0.957  0.290
+assign wn_re[281] = 16'h85FC;    assign wn_im[281] = 16'h26A7;   // 281 -0.953  0.302
+assign wn_re[282] = 16'h8677;    assign wn_im[282] = 16'h2826;   // 282 -0.950  0.314
+assign wn_re[283] = 16'h86F8;    assign wn_im[283] = 16'h29A3;   // 283 -0.946  0.325
+assign wn_re[284] = 16'h877D;    assign wn_im[284] = 16'h2B1E;   // 284 -0.942  0.337
+assign wn_re[285] = 16'h8807;    assign wn_im[285] = 16'h2C98;   // 285 -0.937  0.348
+assign wn_re[286] = 16'h8895;    assign wn_im[286] = 16'h2E10;   // 286 -0.933  0.360
+assign wn_re[287] = 16'h8928;    assign wn_im[287] = 16'h2F86;   // 287 -0.929  0.371
+assign wn_re[288] = 16'h89C0;    assign wn_im[288] = 16'h30FB;   // 288 -0.924  0.383
+assign wn_re[289] = 16'h8A5C;    assign wn_im[289] = 16'h326D;   // 289 -0.919  0.394
+assign wn_re[290] = 16'h8AFD;    assign wn_im[290] = 16'h33DE;   // 290 -0.914  0.405
+assign wn_re[291] = 16'h8BA2;    assign wn_im[291] = 16'h354D;   // 291 -0.909  0.416
+assign wn_re[292] = 16'h8C4B;    assign wn_im[292] = 16'h36B9;   // 292 -0.904  0.428
+assign wn_re[293] = 16'h8CFA;    assign wn_im[293] = 16'h3824;   // 293 -0.899  0.439
+assign wn_re[294] = 16'h8DAC;    assign wn_im[294] = 16'h398C;   // 294 -0.893  0.450
+assign wn_re[295] = 16'h8E63;    assign wn_im[295] = 16'h3AF2;   // 295 -0.888  0.461
+assign wn_re[296] = 16'h8F1F;    assign wn_im[296] = 16'h3C56;   // 296 -0.882  0.471
+assign wn_re[297] = 16'h8FDE;    assign wn_im[297] = 16'h3DB7;   // 297 -0.876  0.482
+assign wn_re[298] = 16'h90A2;    assign wn_im[298] = 16'h3F16;   // 298 -0.870  0.493
+assign wn_re[299] = 16'h916B;    assign wn_im[299] = 16'h4073;   // 299 -0.864  0.504
+assign wn_re[300] = 16'h9237;    assign wn_im[300] = 16'h41CD;   // 300 -0.858  0.514
+assign wn_re[301] = 16'h9308;    assign wn_im[301] = 16'h4325;   // 301 -0.851  0.525
+assign wn_re[302] = 16'h93DD;    assign wn_im[302] = 16'h447A;   // 302 -0.845  0.535
+assign wn_re[303] = 16'h94B6;    assign wn_im[303] = 16'h45CC;   // 303 -0.838  0.545
+assign wn_re[304] = 16'h9594;    assign wn_im[304] = 16'h471C;   // 304 -0.831  0.556
+assign wn_re[305] = 16'h9675;    assign wn_im[305] = 16'h4869;   // 305 -0.825  0.566
+assign wn_re[306] = 16'h975B;    assign wn_im[306] = 16'h49B3;   // 306 -0.818  0.576
+assign wn_re[307] = 16'h9844;    assign wn_im[307] = 16'h4AFA;   // 307 -0.810  0.586
+assign wn_re[308] = 16'h9932;    assign wn_im[308] = 16'h4C3F;   // 308 -0.803  0.596
+assign wn_re[309] = 16'h9A23;    assign wn_im[309] = 16'h4D80;   // 309 -0.796  0.606
+assign wn_re[310] = 16'h9B19;    assign wn_im[310] = 16'h4EBF;   // 310 -0.788  0.615
+assign wn_re[311] = 16'h9C12;    assign wn_im[311] = 16'h4FFA;   // 311 -0.781  0.625
+assign wn_re[312] = 16'h9D0F;    assign wn_im[312] = 16'h5133;   // 312 -0.773  0.634
+assign wn_re[313] = 16'h9E10;    assign wn_im[313] = 16'h5268;   // 313 -0.765  0.644
+assign wn_re[314] = 16'h9F15;    assign wn_im[314] = 16'h539A;   // 314 -0.757  0.653
+assign wn_re[315] = 16'hA01E;    assign wn_im[315] = 16'h54C9;   // 315 -0.749  0.662
+assign wn_re[316] = 16'hA12A;    assign wn_im[316] = 16'h55F4;   // 316 -0.741  0.672
+assign wn_re[317] = 16'hA23A;    assign wn_im[317] = 16'h571D;   // 317 -0.733  0.681
+assign wn_re[318] = 16'hA34D;    assign wn_im[318] = 16'h5842;   // 318 -0.724  0.690
+assign wn_re[319] = 16'hA464;    assign wn_im[319] = 16'h5963;   // 319 -0.716  0.698
+assign wn_re[320] = 16'hA57F;    assign wn_im[320] = 16'h5A81;   // 320 -0.707  0.707
+assign wn_re[321] = 16'hA69D;    assign wn_im[321] = 16'h5B9C;   // 321 -0.698  0.716
+assign wn_re[322] = 16'hA7BE;    assign wn_im[322] = 16'h5CB3;   // 322 -0.690  0.724
+assign wn_re[323] = 16'hA8E3;    assign wn_im[323] = 16'h5DC6;   // 323 -0.681  0.733
+assign wn_re[324] = 16'hAA0C;    assign wn_im[324] = 16'h5ED6;   // 324 -0.672  0.741
+assign wn_re[325] = 16'hAB37;    assign wn_im[325] = 16'h5FE2;   // 325 -0.662  0.749
+assign wn_re[326] = 16'hAC66;    assign wn_im[326] = 16'h60EB;   // 326 -0.653  0.757
+assign wn_re[327] = 16'hAD98;    assign wn_im[327] = 16'h61F0;   // 327 -0.644  0.765
+assign wn_re[328] = 16'hAECD;    assign wn_im[328] = 16'h62F1;   // 328 -0.634  0.773
+assign wn_re[329] = 16'hB006;    assign wn_im[329] = 16'h63EE;   // 329 -0.625  0.781
+assign wn_re[330] = 16'hB141;    assign wn_im[330] = 16'h64E7;   // 330 -0.615  0.788
+assign wn_re[331] = 16'hB280;    assign wn_im[331] = 16'h65DD;   // 331 -0.606  0.796
+assign wn_re[332] = 16'hB3C1;    assign wn_im[332] = 16'h66CE;   // 332 -0.596  0.803
+assign wn_re[333] = 16'hB506;    assign wn_im[333] = 16'h67BC;   // 333 -0.586  0.810
+assign wn_re[334] = 16'hB64D;    assign wn_im[334] = 16'h68A5;   // 334 -0.576  0.818
+assign wn_re[335] = 16'hB797;    assign wn_im[335] = 16'h698B;   // 335 -0.566  0.825
+assign wn_re[336] = 16'hB8E4;    assign wn_im[336] = 16'h6A6C;   // 336 -0.556  0.831
+assign wn_re[337] = 16'hBA34;    assign wn_im[337] = 16'h6B4A;   // 337 -0.545  0.838
+assign wn_re[338] = 16'hBB86;    assign wn_im[338] = 16'h6C23;   // 338 -0.535  0.845
+assign wn_re[339] = 16'hBCDB;    assign wn_im[339] = 16'h6CF8;   // 339 -0.525  0.851
+assign wn_re[340] = 16'hBE33;    assign wn_im[340] = 16'h6DC9;   // 340 -0.514  0.858
+assign wn_re[341] = 16'hBF8D;    assign wn_im[341] = 16'h6E95;   // 341 -0.504  0.864
+assign wn_re[342] = 16'hC0EA;    assign wn_im[342] = 16'h6F5E;   // 342 -0.493  0.870
+assign wn_re[343] = 16'hC249;    assign wn_im[343] = 16'h7022;   // 343 -0.482  0.876
+assign wn_re[344] = 16'hC3AA;    assign wn_im[344] = 16'h70E1;   // 344 -0.471  0.882
+assign wn_re[345] = 16'hC50E;    assign wn_im[345] = 16'h719D;   // 345 -0.461  0.888
+assign wn_re[346] = 16'hC674;    assign wn_im[346] = 16'h7254;   // 346 -0.450  0.893
+assign wn_re[347] = 16'hC7DC;    assign wn_im[347] = 16'h7306;   // 347 -0.439  0.899
+assign wn_re[348] = 16'hC947;    assign wn_im[348] = 16'h73B5;   // 348 -0.428  0.904
+assign wn_re[349] = 16'hCAB3;    assign wn_im[349] = 16'h745E;   // 349 -0.416  0.909
+assign wn_re[350] = 16'hCC22;    assign wn_im[350] = 16'h7503;   // 350 -0.405  0.914
+assign wn_re[351] = 16'hCD93;    assign wn_im[351] = 16'h75A4;   // 351 -0.394  0.919
+assign wn_re[352] = 16'hCF05;    assign wn_im[352] = 16'h7640;   // 352 -0.383  0.924
+assign wn_re[353] = 16'hD07A;    assign wn_im[353] = 16'h76D8;   // 353 -0.371  0.929
+assign wn_re[354] = 16'hD1F0;    assign wn_im[354] = 16'h776B;   // 354 -0.360  0.933
+assign wn_re[355] = 16'hD368;    assign wn_im[355] = 16'h77F9;   // 355 -0.348  0.937
+assign wn_re[356] = 16'hD4E2;    assign wn_im[356] = 16'h7883;   // 356 -0.337  0.942
+assign wn_re[357] = 16'hD65D;    assign wn_im[357] = 16'h7908;   // 357 -0.325  0.946
+assign wn_re[358] = 16'hD7DA;    assign wn_im[358] = 16'h7989;   // 358 -0.314  0.950
+assign wn_re[359] = 16'hD959;    assign wn_im[359] = 16'h7A04;   // 359 -0.302  0.953
+assign wn_re[360] = 16'hDAD9;    assign wn_im[360] = 16'h7A7C;   // 360 -0.290  0.957
+assign wn_re[361] = 16'hDC5A;    assign wn_im[361] = 16'h7AEE;   // 361 -0.279  0.960
+assign wn_re[362] = 16'hDDDD;    assign wn_im[362] = 16'h7B5C;   // 362 -0.267  0.964
+assign wn_re[363] = 16'hDF61;    assign wn_im[363] = 16'h7BC4;   // 363 -0.255  0.967
+assign wn_re[364] = 16'hE0E7;    assign wn_im[364] = 16'h7C29;   // 364 -0.243  0.970
+assign wn_re[365] = 16'hE26D;    assign wn_im[365] = 16'h7C88;   // 365 -0.231  0.973
+assign wn_re[366] = 16'hE3F5;    assign wn_im[366] = 16'h7CE2;   // 366 -0.219  0.976
+assign wn_re[367] = 16'hE57E;    assign wn_im[367] = 16'h7D38;   // 367 -0.207  0.978
+assign wn_re[368] = 16'hE708;    assign wn_im[368] = 16'h7D89;   // 368 -0.195  0.981
+assign wn_re[369] = 16'hE893;    assign wn_im[369] = 16'h7DD5;   // 369 -0.183  0.983
+assign wn_re[370] = 16'hEA1F;    assign wn_im[370] = 16'h7E1C;   // 370 -0.171  0.985
+assign wn_re[371] = 16'hEBAB;    assign wn_im[371] = 16'h7E5E;   // 371 -0.159  0.987
+assign wn_re[372] = 16'hED39;    assign wn_im[372] = 16'h7E9C;   // 372 -0.147  0.989
+assign wn_re[373] = 16'hEEC7;    assign wn_im[373] = 16'h7ED4;   // 373 -0.135  0.991
+assign wn_re[374] = 16'hF055;    assign wn_im[374] = 16'h7F08;   // 374 -0.122  0.992
+assign wn_re[375] = 16'hF1E5;    assign wn_im[375] = 16'h7F37;   // 375 -0.110  0.994
+assign wn_re[376] = 16'hF375;    assign wn_im[376] = 16'h7F61;   // 376 -0.098  0.995
+assign wn_re[377] = 16'hF505;    assign wn_im[377] = 16'h7F86;   // 377 -0.086  0.996
+assign wn_re[378] = 16'hF696;    assign wn_im[378] = 16'h7FA6;   // 378 -0.074  0.997
+assign wn_re[379] = 16'hF827;    assign wn_im[379] = 16'h7FC1;   // 379 -0.061  0.998
+assign wn_re[380] = 16'hF9B9;    assign wn_im[380] = 16'h7FD7;   // 380 -0.049  0.999
+assign wn_re[381] = 16'hFB4A;    assign wn_im[381] = 16'h7FE8;   // 381 -0.037  0.999
+assign wn_re[382] = 16'hFCDC;    assign wn_im[382] = 16'h7FF5;   // 382 -0.025  1.000
+assign wn_re[383] = 16'hFE6E;    assign wn_im[383] = 16'h7FFC;   // 383 -0.012  1.000
+assign wn_re[384] = 16'h0000;    assign wn_im[384] = 16'h7FFF;   // 384 -0.000  1.000
+assign wn_re[385] = 16'h0192;    assign wn_im[385] = 16'h7FFC;   // 385  0.012  1.000
+assign wn_re[386] = 16'h0324;    assign wn_im[386] = 16'h7FF5;   // 386  0.025  1.000
+assign wn_re[387] = 16'h04B6;    assign wn_im[387] = 16'h7FE8;   // 387  0.037  0.999
+assign wn_re[388] = 16'h0647;    assign wn_im[388] = 16'h7FD7;   // 388  0.049  0.999
+assign wn_re[389] = 16'h07D9;    assign wn_im[389] = 16'h7FC1;   // 389  0.061  0.998
+assign wn_re[390] = 16'h096A;    assign wn_im[390] = 16'h7FA6;   // 390  0.074  0.997
+assign wn_re[391] = 16'h0AFB;    assign wn_im[391] = 16'h7F86;   // 391  0.086  0.996
+assign wn_re[392] = 16'h0C8B;    assign wn_im[392] = 16'h7F61;   // 392  0.098  0.995
+assign wn_re[393] = 16'h0E1B;    assign wn_im[393] = 16'h7F37;   // 393  0.110  0.994
+assign wn_re[394] = 16'h0FAB;    assign wn_im[394] = 16'h7F08;   // 394  0.122  0.992
+assign wn_re[395] = 16'h1139;    assign wn_im[395] = 16'h7ED4;   // 395  0.135  0.991
+assign wn_re[396] = 16'h12C7;    assign wn_im[396] = 16'h7E9C;   // 396  0.147  0.989
+assign wn_re[397] = 16'h1455;    assign wn_im[397] = 16'h7E5E;   // 397  0.159  0.987
+assign wn_re[398] = 16'h15E1;    assign wn_im[398] = 16'h7E1C;   // 398  0.171  0.985
+assign wn_re[399] = 16'h176D;    assign wn_im[399] = 16'h7DD5;   // 399  0.183  0.983
+assign wn_re[400] = 16'h18F8;    assign wn_im[400] = 16'h7D89;   // 400  0.195  0.981
+assign wn_re[401] = 16'h1A82;    assign wn_im[401] = 16'h7D38;   // 401  0.207  0.978
+assign wn_re[402] = 16'h1C0B;    assign wn_im[402] = 16'h7CE2;   // 402  0.219  0.976
+assign wn_re[403] = 16'h1D93;    assign wn_im[403] = 16'h7C88;   // 403  0.231  0.973
+assign wn_re[404] = 16'h1F19;    assign wn_im[404] = 16'h7C29;   // 404  0.243  0.970
+assign wn_re[405] = 16'h209F;    assign wn_im[405] = 16'h7BC4;   // 405  0.255  0.967
+assign wn_re[406] = 16'h2223;    assign wn_im[406] = 16'h7B5C;   // 406  0.267  0.964
+assign wn_re[407] = 16'h23A6;    assign wn_im[407] = 16'h7AEE;   // 407  0.279  0.960
+assign wn_re[408] = 16'h2527;    assign wn_im[408] = 16'h7A7C;   // 408  0.290  0.957
+assign wn_re[409] = 16'h26A7;    assign wn_im[409] = 16'h7A04;   // 409  0.302  0.953
+assign wn_re[410] = 16'h2826;    assign wn_im[410] = 16'h7989;   // 410  0.314  0.950
+assign wn_re[411] = 16'h29A3;    assign wn_im[411] = 16'h7908;   // 411  0.325  0.946
+assign wn_re[412] = 16'h2B1E;    assign wn_im[412] = 16'h7883;   // 412  0.337  0.942
+assign wn_re[413] = 16'h2C98;    assign wn_im[413] = 16'h77F9;   // 413  0.348  0.937
+assign wn_re[414] = 16'h2E10;    assign wn_im[414] = 16'h776B;   // 414  0.360  0.933
+assign wn_re[415] = 16'h2F86;    assign wn_im[415] = 16'h76D8;   // 415  0.371  0.929
+assign wn_re[416] = 16'h30FB;    assign wn_im[416] = 16'h7640;   // 416  0.383  0.924
+assign wn_re[417] = 16'h326D;    assign wn_im[417] = 16'h75A4;   // 417  0.394  0.919
+assign wn_re[418] = 16'h33DE;    assign wn_im[418] = 16'h7503;   // 418  0.405  0.914
+assign wn_re[419] = 16'h354D;    assign wn_im[419] = 16'h745E;   // 419  0.416  0.909
+assign wn_re[420] = 16'h36B9;    assign wn_im[420] = 16'h73B5;   // 420  0.428  0.904
+assign wn_re[421] = 16'h3824;    assign wn_im[421] = 16'h7306;   // 421  0.439  0.899
+assign wn_re[422] = 16'h398C;    assign wn_im[422] = 16'h7254;   // 422  0.450  0.893
+assign wn_re[423] = 16'h3AF2;    assign wn_im[423] = 16'h719D;   // 423  0.461  0.888
+assign wn_re[424] = 16'h3C56;    assign wn_im[424] = 16'h70E1;   // 424  0.471  0.882
+assign wn_re[425] = 16'h3DB7;    assign wn_im[425] = 16'h7022;   // 425  0.482  0.876
+assign wn_re[426] = 16'h3F16;    assign wn_im[426] = 16'h6F5E;   // 426  0.493  0.870
+assign wn_re[427] = 16'h4073;    assign wn_im[427] = 16'h6E95;   // 427  0.504  0.864
+assign wn_re[428] = 16'h41CD;    assign wn_im[428] = 16'h6DC9;   // 428  0.514  0.858
+assign wn_re[429] = 16'h4325;    assign wn_im[429] = 16'h6CF8;   // 429  0.525  0.851
+assign wn_re[430] = 16'h447A;    assign wn_im[430] = 16'h6C23;   // 430  0.535  0.845
+assign wn_re[431] = 16'h45CC;    assign wn_im[431] = 16'h6B4A;   // 431  0.545  0.838
+assign wn_re[432] = 16'h471C;    assign wn_im[432] = 16'h6A6C;   // 432  0.556  0.831
+assign wn_re[433] = 16'h4869;    assign wn_im[433] = 16'h698B;   // 433  0.566  0.825
+assign wn_re[434] = 16'h49B3;    assign wn_im[434] = 16'h68A5;   // 434  0.576  0.818
+assign wn_re[435] = 16'h4AFA;    assign wn_im[435] = 16'h67BC;   // 435  0.586  0.810
+assign wn_re[436] = 16'h4C3F;    assign wn_im[436] = 16'h66CE;   // 436  0.596  0.803
+assign wn_re[437] = 16'h4D80;    assign wn_im[437] = 16'h65DD;   // 437  0.606  0.796
+assign wn_re[438] = 16'h4EBF;    assign wn_im[438] = 16'h64E7;   // 438  0.615  0.788
+assign wn_re[439] = 16'h4FFA;    assign wn_im[439] = 16'h63EE;   // 439  0.625  0.781
+assign wn_re[440] = 16'h5133;    assign wn_im[440] = 16'h62F1;   // 440  0.634  0.773
+assign wn_re[441] = 16'h5268;    assign wn_im[441] = 16'h61F0;   // 441  0.644  0.765
+assign wn_re[442] = 16'h539A;    assign wn_im[442] = 16'h60EB;   // 442  0.653  0.757
+assign wn_re[443] = 16'h54C9;    assign wn_im[443] = 16'h5FE2;   // 443  0.662  0.749
+assign wn_re[444] = 16'h55F4;    assign wn_im[444] = 16'h5ED6;   // 444  0.672  0.741
+assign wn_re[445] = 16'h571D;    assign wn_im[445] = 16'h5DC6;   // 445  0.681  0.733
+assign wn_re[446] = 16'h5842;    assign wn_im[446] = 16'h5CB3;   // 446  0.690  0.724
+assign wn_re[447] = 16'h5963;    assign wn_im[447] = 16'h5B9C;   // 447  0.698  0.716
+assign wn_re[448] = 16'h5A81;    assign wn_im[448] = 16'h5A81;   // 448  0.707  0.707
+assign wn_re[449] = 16'h5B9C;    assign wn_im[449] = 16'h5963;   // 449  0.716  0.698
+assign wn_re[450] = 16'h5CB3;    assign wn_im[450] = 16'h5842;   // 450  0.724  0.690
+assign wn_re[451] = 16'h5DC6;    assign wn_im[451] = 16'h571D;   // 451  0.733  0.681
+assign wn_re[452] = 16'h5ED6;    assign wn_im[452] = 16'h55F4;   // 452  0.741  0.672
+assign wn_re[453] = 16'h5FE2;    assign wn_im[453] = 16'h54C9;   // 453  0.749  0.662
+assign wn_re[454] = 16'h60EB;    assign wn_im[454] = 16'h539A;   // 454  0.757  0.653
+assign wn_re[455] = 16'h61F0;    assign wn_im[455] = 16'h5268;   // 455  0.765  0.644
+assign wn_re[456] = 16'h62F1;    assign wn_im[456] = 16'h5133;   // 456  0.773  0.634
+assign wn_re[457] = 16'h63EE;    assign wn_im[457] = 16'h4FFA;   // 457  0.781  0.625
+assign wn_re[458] = 16'h64E7;    assign wn_im[458] = 16'h4EBF;   // 458  0.788  0.615
+assign wn_re[459] = 16'h65DD;    assign wn_im[459] = 16'h4D80;   // 459  0.796  0.606
+assign wn_re[460] = 16'h66CE;    assign wn_im[460] = 16'h4C3F;   // 460  0.803  0.596
+assign wn_re[461] = 16'h67BC;    assign wn_im[461] = 16'h4AFA;   // 461  0.810  0.586
+assign wn_re[462] = 16'h68A5;    assign wn_im[462] = 16'h49B3;   // 462  0.818  0.576
+assign wn_re[463] = 16'h698B;    assign wn_im[463] = 16'h4869;   // 463  0.825  0.566
+assign wn_re[464] = 16'h6A6C;    assign wn_im[464] = 16'h471C;   // 464  0.831  0.556
+assign wn_re[465] = 16'h6B4A;    assign wn_im[465] = 16'h45CC;   // 465  0.838  0.545
+assign wn_re[466] = 16'h6C23;    assign wn_im[466] = 16'h447A;   // 466  0.845  0.535
+assign wn_re[467] = 16'h6CF8;    assign wn_im[467] = 16'h4325;   // 467  0.851  0.525
+assign wn_re[468] = 16'h6DC9;    assign wn_im[468] = 16'h41CD;   // 468  0.858  0.514
+assign wn_re[469] = 16'h6E95;    assign wn_im[469] = 16'h4073;   // 469  0.864  0.504
+assign wn_re[470] = 16'h6F5E;    assign wn_im[470] = 16'h3F16;   // 470  0.870  0.493
+assign wn_re[471] = 16'h7022;    assign wn_im[471] = 16'h3DB7;   // 471  0.876  0.482
+assign wn_re[472] = 16'h70E1;    assign wn_im[472] = 16'h3C56;   // 472  0.882  0.471
+assign wn_re[473] = 16'h719D;    assign wn_im[473] = 16'h3AF2;   // 473  0.888  0.461
+assign wn_re[474] = 16'h7254;    assign wn_im[474] = 16'h398C;   // 474  0.893  0.450
+assign wn_re[475] = 16'h7306;    assign wn_im[475] = 16'h3824;   // 475  0.899  0.439
+assign wn_re[476] = 16'h73B5;    assign wn_im[476] = 16'h36B9;   // 476  0.904  0.428
+assign wn_re[477] = 16'h745E;    assign wn_im[477] = 16'h354D;   // 477  0.909  0.416
+assign wn_re[478] = 16'h7503;    assign wn_im[478] = 16'h33DE;   // 478  0.914  0.405
+assign wn_re[479] = 16'h75A4;    assign wn_im[479] = 16'h326D;   // 479  0.919  0.394
+assign wn_re[480] = 16'h7640;    assign wn_im[480] = 16'h30FB;   // 480  0.924  0.383
+assign wn_re[481] = 16'h76D8;    assign wn_im[481] = 16'h2F86;   // 481  0.929  0.371
+assign wn_re[482] = 16'h776B;    assign wn_im[482] = 16'h2E10;   // 482  0.933  0.360
+assign wn_re[483] = 16'h77F9;    assign wn_im[483] = 16'h2C98;   // 483  0.937  0.348
+assign wn_re[484] = 16'h7883;    assign wn_im[484] = 16'h2B1E;   // 484  0.942  0.337
+assign wn_re[485] = 16'h7908;    assign wn_im[485] = 16'h29A3;   // 485  0.946  0.325
+assign wn_re[486] = 16'h7989;    assign wn_im[486] = 16'h2826;   // 486  0.950  0.314
+assign wn_re[487] = 16'h7A04;    assign wn_im[487] = 16'h26A7;   // 487  0.953  0.302
+assign wn_re[488] = 16'h7A7C;    assign wn_im[488] = 16'h2527;   // 488  0.957  0.290
+assign wn_re[489] = 16'h7AEE;    assign wn_im[489] = 16'h23A6;   // 489  0.960  0.279
+assign wn_re[490] = 16'h7B5C;    assign wn_im[490] = 16'h2223;   // 490  0.964  0.267
+assign wn_re[491] = 16'h7BC4;    assign wn_im[491] = 16'h209F;   // 491  0.967  0.255
+assign wn_re[492] = 16'h7C29;    assign wn_im[492] = 16'h1F19;   // 492  0.970  0.243
+assign wn_re[493] = 16'h7C88;    assign wn_im[493] = 16'h1D93;   // 493  0.973  0.231
+assign wn_re[494] = 16'h7CE2;    assign wn_im[494] = 16'h1C0B;   // 494  0.976  0.219
+assign wn_re[495] = 16'h7D38;    assign wn_im[495] = 16'h1A82;   // 495  0.978  0.207
+assign wn_re[496] = 16'h7D89;    assign wn_im[496] = 16'h18F8;   // 496  0.981  0.195
+assign wn_re[497] = 16'h7DD5;    assign wn_im[497] = 16'h176D;   // 497  0.983  0.183
+assign wn_re[498] = 16'h7E1C;    assign wn_im[498] = 16'h15E1;   // 498  0.985  0.171
+assign wn_re[499] = 16'h7E5E;    assign wn_im[499] = 16'h1455;   // 499  0.987  0.159
+assign wn_re[500] = 16'h7E9C;    assign wn_im[500] = 16'h12C7;   // 500  0.989  0.147
+assign wn_re[501] = 16'h7ED4;    assign wn_im[501] = 16'h1139;   // 501  0.991  0.135
+assign wn_re[502] = 16'h7F08;    assign wn_im[502] = 16'h0FAB;   // 502  0.992  0.122
+assign wn_re[503] = 16'h7F37;    assign wn_im[503] = 16'h0E1B;   // 503  0.994  0.110
+assign wn_re[504] = 16'h7F61;    assign wn_im[504] = 16'h0C8B;   // 504  0.995  0.098
+assign wn_re[505] = 16'h7F86;    assign wn_im[505] = 16'h0AFB;   // 505  0.996  0.086
+assign wn_re[506] = 16'h7FA6;    assign wn_im[506] = 16'h096A;   // 506  0.997  0.074
+assign wn_re[507] = 16'h7FC1;    assign wn_im[507] = 16'h07D9;   // 507  0.998  0.061
+assign wn_re[508] = 16'h7FD7;    assign wn_im[508] = 16'h0647;   // 508  0.999  0.049
+assign wn_re[509] = 16'h7FE8;    assign wn_im[509] = 16'h04B6;   // 509  0.999  0.037
+assign wn_re[510] = 16'h7FF5;    assign wn_im[510] = 16'h0324;   // 510  1.000  0.025
+assign wn_re[511] = 16'h7FFC;    assign wn_im[511] = 16'h0192;   // 511  1.000  0.012

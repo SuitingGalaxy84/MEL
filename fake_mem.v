@@ -1,25 +1,33 @@
 module fake_mem_gen#(
-    parameter MEM_DEPTH  = 2**32,
-    parameter DATA_WIDTH = 8,
-    parameter ADDR_WIDTH = $clog2(MEM_DEPTH)
+    parameter MEM_DEPTH  = 20, 
+    parameter DATA_WIDTH = 32, // Data width is now 32 bits
+    parameter ADDR_WIDTH = $clog2(MEM_DEPTH) // Correctly calculate address width
 )(
     input                           clk,
-    input                           rst_n,
     input                           wr_en,
+    input                           rd_en, 
+    input [DATA_WIDTH-1:0]          data_in,
     input [ADDR_WIDTH-1:0]          program_counter,
-    output reg [4*DATA_WIDTH-1:0]     data_out
+    output reg [DATA_WIDTH-1:0]     data_out
 );
-    reg [DATA_WIDTH-1:0] mem [0:MEM_DEPTH-1];   
+    // Memory is now 32 bits wide.
+    reg [DATA_WIDTH-1:0] mem [0:MEM_DEPTH-1];
+
+`ifndef SYNTHESIS
     initial begin
-        $readmemh("fake_mem_init.txt", mem);
+        // Use a new initialization file for the 32-bit wide memory
+        $readmemh("D:\\Desktop\\PG Repo\\MEL\\fake_mem_tc\\fake_mem_init_32bit.txt", mem, 0, MEM_DEPTH);
     end
-    always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            data_out <= {4{8'h00}};
-        end else if(wr_en) begin
-            data_out <= {mem[program_counter], mem[program_counter+1], mem[program_counter+2], mem[program_counter+3]};
+`endif
+
+    // This is a standard synchronous read, which is easily synthesized to BRAM.
+    always @(posedge clk) begin
+        if(wr_en) begin
+            // Convert byte address to word address by right-shifting by 2 (dividing by 4)
+            mem[program_counter >> 2] <= data_in;
+        end else if (rd_en) begin
+            data_out <= mem[program_counter >> 2];
         end
     end
-    
-
+     
 endmodule

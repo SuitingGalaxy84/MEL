@@ -17,9 +17,9 @@ module SYNC_FIFO_MWSR#(
     output                  full,
     
     // Read interface
-    input                   rd_en,
-    output [R_WIDTH-1:0]    rd_data,
-    output                  empty
+    input                       rd_en,
+    output reg [R_WIDTH-1:0]    rd_data,
+    output                      empty
 );
 
     localparam RATIO = R_WIDTH / W_WIDTH;
@@ -30,7 +30,7 @@ module SYNC_FIFO_MWSR#(
     // write logic
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            wr_prt <= 0;
+            wr_ptr <= 0;
         end else if (wr_en && !full) begin
             wr_ptr <= wr_ptr + 1;
             mem[wr_ptr] <= wr_data;
@@ -39,14 +39,16 @@ module SYNC_FIFO_MWSR#(
 
     // read logic
     integer i;
+    always @(*) begin
+        for (i = 0; i < RATIO; i = i + 1) begin
+            rd_data[(i+1)*W_WIDTH-1 -: W_WIDTH] <= mem[rd_ptr * RATIO + i];
+        end
+    end 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             rd_ptr <= 0;
         end else if (rd_en && !empty) begin
             rd_ptr <= rd_ptr + 1;
-            for (i = 0; i < RATIO; i = i + 1) begin
-                rd_data[(i+1)*W_WIDTH-1 -: W_WIDTH] <= mem[rd_ptr * RATIO + i];
-            end
         end
     end
 

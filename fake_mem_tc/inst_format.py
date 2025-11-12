@@ -55,10 +55,11 @@ def parse_instructions(raw_inst_pth, out_pth):
                 # Hex format: remove underscores
                 hex_value = data_part.replace('_', '').upper()
             
+            outfile.write(hex_value + '\n')
             # Write each byte (2 hex digits) on a separate line
-            for i in range(0, len(hex_value), 2):
-                if i + 1 < len(hex_value):
-                    outfile.write(hex_value[i:i+2] + '\n')
+            # for i in range(0, len(hex_value), 2):
+            #     if i + 1 < len(hex_value):
+            #         outfile.write(hex_value[i:i+2] + '\n')
             
             instruction_count += 1
     

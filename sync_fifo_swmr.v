@@ -31,7 +31,7 @@ module SYNC_FIFO_SWMR#(
     integer i;
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            wr_prt <= 0;
+            wr_ptr <= 0;
         end else if (wr_en && !full) begin
             wr_ptr <= wr_ptr + 1;
             // write data into memory
@@ -42,11 +42,11 @@ module SYNC_FIFO_SWMR#(
     end 
 
     // read logic
+    assign rd_data = mem[rd_ptr];
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             rd_ptr <= 0;
         end else if (rd_en && !empty) begin
-            rd_data <= mem[rd_ptr];
             rd_ptr <= rd_ptr + 1;
         end
     end
