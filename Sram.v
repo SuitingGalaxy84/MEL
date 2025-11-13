@@ -25,6 +25,7 @@ module SRAM #(
             // 异步复位：清空SRAM内容
             for (i = 0; i < ADDR_DEPTH; i = i + 1) begin
                 mem[i] <= 0;
+                dout   <= 0;
             end
         end else if (cs && we) begin
             mem[w_addr] <= din;
@@ -37,7 +38,7 @@ module SRAM #(
             if (we && (w_addr == r_addr)) begin
                 // *Read-after-write hazard handling
                 dout <= din;
-            end else if (!we) begin
+            end else begin
                 dout <= mem[r_addr];
             end
         end

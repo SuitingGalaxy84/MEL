@@ -63,7 +63,7 @@ def generate_hann_window(window_len, bit_width=16, output_file=None):
 
 def main():
     parser = argparse.ArgumentParser(description='Generate Hann window coefficients')
-    parser.add_argument('--window-len', type=int, default=512, help='Length of the Hann window')
+    parser.add_argument('--window-len', type=int, default=480, help='Length of the Hann window')
     parser.add_argument('--bit-width', type=int, default=16, help='Bit width for fixed-point representation (default: 16)')
     parser.add_argument('--output', type=str, default="HannWin.txt", help='Output file path to save coefficients')
     

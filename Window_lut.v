@@ -16,57 +16,57 @@ module WIN_LUT#(
     output                      dout_en,
     output [WIDTH-1:0]          dout_re,
     output [WIDTH-1:0]          dout_im,
-    output reg                  data_full
+    output                      data_full,
+    output                      data_empty
 );
 
-    wire win_coe_we                     = rst_n & lut_en;
     wire [2*WIDTH-1:0] data_sram_in     = {din_re, din_im};
     wire [2*WIDTH-1:0] data_mu_in;
-    wire [WIDTH-1:0] coe_mu_in;
+    wire [WIDTH-1:0] coe_mu_in; 
     
     
     reg [WIN_LEN_WIDTH-1:0] w_data_ptr, r_data_ptr;
-    reg [N_FFT_WIDTH-1:0] r_coe_ptr, w_coe_ptr; // Changed to n_fft width for padding
-    
-    wire [N_FFT_WIDTH-1:0] next_r_coe_ptr       = (r_coe_ptr == n_fft - 1) ? 0 : r_coe_ptr + 1;
-    wire [WIN_LEN_WIDTH-1:0] next_w_coe_ptr       = (w_coe_ptr == WIN_LEN - 1) ? 0 : w_coe_ptr + 1;
-    wire [WIN_LEN_WIDTH-1:0] next_r_data_ptr      = (r_coe_ptr == n_fft - 1) ? r_data_ptr - (WIN_LEN - hop_len) : r_data_ptr + 1;
-    
-    // --- Input SRAM Padding / Regular Pointer Logic ---
+    reg [N_FFT_WIDTH-1:0] r_idx_ptr;
+    reg first_frame;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            w_data_ptr          <= 0;
-            r_data_ptr          <= 0;
-            w_coe_ptr           <= 0;
-            r_coe_ptr           <= 0;
-
+            w_data_ptr  <= 0;
+            r_data_ptr  <= 0;
+            r_idx_ptr   <= 0;
+            first_frame <= 1'b1;
         end else begin
             if (den) begin
-                w_data_ptr      <= w_data_ptr + 1;               
-                r_coe_ptr       <= next_r_coe_ptr;
-                if (r_coe_ptr < WIN_LEN) begin // Only advance data pointer during windowing part
-                    r_data_ptr      <= next_r_data_ptr;
-                end
-            end else begin
-                w_data_ptr      <= w_data_ptr;
-                r_coe_ptr       <= r_coe_ptr;
-                r_data_ptr      <= r_data_ptr;
+                w_data_ptr <= w_data_ptr + 1;
+                first_frame <= (w_data_ptr == HOP_LEN - 1) ? 1'b0 : first_frame;
             end
+        end 
+    end
 
-            // Load window coefficient pointer
-            if (lut_en) begin
-                w_coe_ptr       <= next_w_coe_ptr;
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            r_data_ptr <= 0;
+            r_idx_ptr  <= 0;
+        end else begin
+            if (first_frame) begin
+                r_data_ptr <= 0;
+                r_idx_ptr  <= 0;
             end else begin
-                w_coe_ptr       <= w_coe_ptr;
-            end
+                r_idx_ptr  <= (r_idx_ptr == N_FFT - 1) ? 0 : r_idx_ptr + 1;
+                if(r_idx_ptr < WIN_LEN - 1) begin
+                    r_data_ptr <= r_data_ptr + 1;
+                end else if (r_idx_ptr == WIN_LEN - 1) begin
+                    r_data_ptr <= r_data_ptr - (WIN_LEN - HOP_LEN);
+                end 
+             end
         end
-    end  
+    end 
+
 
     // --- SRAM Instantiation ---
     SRAM #(
-        .DATA_WIDTH         (2*WIDTH     ),
-        .ADDR_WIDTH         (WIN_LEN     )
+        .DATA_WIDTH         (2*WIDTH        ),
+        .ADDR_WIDTH         ($clog2(WIN_LEN))
     ) DATA_BUFF (
         .clk                (clk            ),
         .rstn               (rst_n          ),
@@ -78,84 +78,38 @@ module WIN_LUT#(
         .dout               (data_mu_in     )
     );
 
-    
+    HANN_WIN HANN_WIN_inst (
+        .clk                (clk            ),
+        .rst_n              (rst_n          ),
+        .addr               (r_idx_ptr      ),  
+        .win_coe_out        (coe_mu_in      )
+    );
+
 
 
     // --- MU Output Wires ---
     wire [WIDTH-1:0] data_mu_re;
     wire [WIDTH-1:0] data_mu_im;
-
+    wire [WIDTH-1:0] mu_a_re = r_idx_ptr >= WIN_LEN ? 0 : data_mu_in[2*WIDTH-1:WIDTH];
+    wire [WIDTH-1:0] mu_b_re = r_idx_ptr >= WIN_LEN ? 0 : coe_mu_in;
     // --- MU Instantiation ---
-    // This MU is pure combinational, zero latency
-    // Note: Applying a window is element-wise multiplication of the signal and the window coefficients.
     Multiply #(
         .WIDTH              (WIDTH)
     ) MU_inst (
-        .a_re               (data_mu_in[2*WIDTH-1:WIDTH] ),
-        .a_im               (data_mu_in[WIDTH-1:0]       ),
-        .b_re               (coe_mu_in                   ),
+        .a_re               (mu_a_re                     ),
+        .a_im               (0                           ),
+        .b_re               (mu_b_re                     ),
         .b_im               (0                           ),
         .m_re               (data_mu_re                  ),
         .m_im               (data_mu_im                  )
     );
 
-    // --- Data Overflow Flag Logic ---
-    wire [WIN_LEN_WIDTH:0] pesudo_rptr = r_data_ptr - (WIN_LEN - HOP_LEN);
-    wire [WIN_LEN_WIDTH:0] ptr_dist    = w_data_ptr - r_data_ptr;
-    always @(*) begin
-        if (w_data_ptr > r_data_ptr) begin
-            data_full       = pesudo_rptr > w_data_ptr ? 1 : 0;
-        end else begin
-            data_full       = pesudo_rptr > w_data_ptr && ptr_dist > 0 ? 1 : 0; // exclude the case when pointers are equal
-        end
-    end 
 
-    // --- Data Output Logic ---
-    // Pipeline the output data and enable signal to match the SRAM read latency
-    reg dout_en_reg;
-    reg [WIDTH-1:0] dout_re_reg;
-    reg [WIDTH-1:0] dout_im_reg;
-    reg [N_FFT_WIDTH-1:0] out_cnt;
-    reg output_active;
+    assign dout_en = r_idx_ptr != 0;
+    assign dout_re = data_mu_re;
+    assign dout_im = data_mu_im;
+    assign data_full = (r_data_ptr - w_data_ptr) < (WIN_LEN - HOP_LEN) && !first_frame;
+    assign data_empty = first_frame;
 
-
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            dout_en_reg <= 1'b0;
-            dout_re_reg <= {WIDTH{1'b0}};
-            dout_im_reg <= {WIDTH{1'b0}};
-            out_cnt     <= 0;
-        end else begin
-
-            // dout_en_reg is a level signal indicating the module is outputting a full window
-            // output_active is set when output starts and cleared after n_fft samples
-            if (!output_active && den) begin
-                // start outputting when data enable first becomes active
-                output_active <= 1'b1;
-            end else if (output_active && (out_cnt == n_fft - 1)) begin
-                // clear when the window has completed
-                output_active <= 1'b0;
-            end else begin
-                output_active <= output_active;
-            end
-            dout_en_reg <= output_active;
-
-            if (den) begin
-                if (out_cnt < WIN_LEN) begin
-                    dout_re_reg <= data_mu_re;
-                    dout_im_reg <= data_mu_im;
-                end else begin
-                    dout_re_reg <= 0;
-                    dout_im_reg <= 0;
-                end
-                out_cnt <= (out_cnt == n_fft - 1) ? 0 : out_cnt + 1;
-            end
-        end
-    end
-    
-    // Assign output ports
-    assign dout_en = dout_en_reg;
-    assign dout_re = dout_re_reg;
-    assign dout_im = dout_im_reg;
 
 endmodule
