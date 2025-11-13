@@ -4,7 +4,7 @@ module WIN_LUT#(
     parameter WIN_LEN           = 480,
     parameter HOP_LEN           = 160,
 
-    parameter WIN_LEN_WIDTH   = $clog2(WIN_LEN),
+    parameter BUFF_ADDR_WIDTH   = $clog2(WIN_LEN + HOP_LEN),
     parameter N_FFT_WIDTH     = $clog2(N_FFT)
     
 )(
@@ -25,7 +25,7 @@ module WIN_LUT#(
     wire [WIDTH-1:0] coe_mu_in; 
     
     
-    reg [WIN_LEN_WIDTH-1:0] w_data_ptr, r_data_ptr;
+    reg [BUFF_ADDR_WIDTH-1:0] w_data_ptr, r_data_ptr;
     reg [N_FFT_WIDTH-1:0] r_idx_ptr;
     reg first_frame;
 
@@ -66,7 +66,7 @@ module WIN_LUT#(
     // --- SRAM Instantiation ---
     SRAM #(
         .DATA_WIDTH         (2*WIDTH        ),
-        .ADDR_WIDTH         ($clog2(WIN_LEN))
+        .ADDR_WIDTH         ($clog2(WIN_LEN+HOP_LEN))
     ) DATA_BUFF (
         .clk                (clk            ),
         .rstn               (rst_n          ),
