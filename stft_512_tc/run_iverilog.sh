@@ -2,7 +2,7 @@
 
 echo "Remove Old Compilation Files ..."
 if [ -e tb_stft_512.vvp ]; then
-    rm -f tb_stft_512.vvp
+    rm -f tb_stft_512.vvp 
 else
     echo "No existing tb_stft_512.vvp to remove."
 fi

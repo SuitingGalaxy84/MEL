@@ -19,8 +19,8 @@ if (-Not (Test-Path "input.txt")) {
 Write-Host "`nCompiling Verilog files..." -ForegroundColor Yellow
 
 $verilog_files = @(
-    "..\Sram.v",
-    "..\HannWin.v",
+    "..\cir_buffer.v",
+    "..\HannWin480.v",
     "..\Multiply.v",
     "..\Window_lut.v",
     "tb_Window_lut.v"
@@ -57,7 +57,7 @@ Write-Host "`nSimulation completed!" -ForegroundColor Green
 
 # Run verification
 Write-Host "`nRunning verification..." -ForegroundColor Yellow
-D:\anaconda3\envs\pytorch\python verify.py
+python verify.py
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "`nVerification script encountered errors" -ForegroundColor Red

@@ -12,6 +12,7 @@ module CIRCULAR_BUFFER #(
     output                      full,
 
     input                       rd_en,
+    input                       rd_jump,
     output reg [WIDTH-1:0]      dout,
     output                      empty,
     output                      almost_empty,
@@ -49,9 +50,16 @@ module CIRCULAR_BUFFER #(
         if(!rst_n) begin
             read_ptr    <= 0;
         end else if (rd_en & ~empty) begin
-            read_ptr    <= read_ptr == DEPTH - 1 ? 0 : read_ptr + 1;
+            if (rd_jump) begin
+                read_ptr    <= init_read_ptr + HOP_LENGTH >= DEPTH ? (init_read_ptr + HOP_LENGTH - DEPTH) : (init_read_ptr + HOP_LENGTH);
+            end else begin
+                read_ptr    <= read_ptr == DEPTH - 1 ? 0 : read_ptr + 1;
+            end 
         end 
     end 
+            
+
+            
 
     // count logic
     integer i;
@@ -61,7 +69,7 @@ module CIRCULAR_BUFFER #(
         end else begin
             case({wr_en & ~full, rd_en & ~empty})
                 2'b10: count_r  <= count_r + 1;
-                2'b01: count_r  <= count_r - 1;
+                2'b01: count_r  <= count_r > 0 ? count_r - 1 : 0;
                 default: count_r <= count_r;
             endcase
         end 
@@ -97,18 +105,23 @@ module CIRCULAR_BUFFER #(
         end 
     end 
 
-    assign full = isfull(write_ptr, init_read_ptr);
-    assign empty = (count_r == 0) ? 1'b1 : 1'b0;
+    assign full = isfull(write_ptr, read_ptr, init_read_ptr);
+    assign empty = (read_ptr == write_ptr) ? 1'b1 : 1'b0; //isempty(read_ptr, write_ptr, init_write_ptr);
     assign almost_empty = is_almost_empty(count_r);
 
     // full logic
     function isfull;
         input [ADDR_WIDTH-1:0] write_ptr;
+        input [ADDR_WIDTH-1:0] read_ptr;
         input [ADDR_WIDTH-1:0] init_read_ptr;
-        if (write_ptr == init_read_ptr + HOP_LENGTH - 1) begin
-            isfull = 1'b1;
-        end else begin
+        if (write_ptr >= read_ptr) begin
             isfull = 1'b0;
+        end else begin
+            if(init_read_ptr + HOP_LENGTH - 1 > DEPTH - 1) begin
+                isfull = (write_ptr == ((init_read_ptr + HOP_LENGTH - 1) - DEPTH)) ? 1'b1 : 1'b0;
+            end else begin
+                isfull = (write_ptr == (init_read_ptr + HOP_LENGTH - 1)) ? 1'b1 : 1'b0;
+            end
         end
     endfunction    
 
@@ -119,6 +132,23 @@ module CIRCULAR_BUFFER #(
             is_almost_empty = 1'b1;
         end else begin
             is_almost_empty = 1'b0;
+        end
+    endfunction
+
+    function isempty;
+        input [ADDR_WIDTH-1:0] read_ptr;
+        input [ADDR_WIDTH-1:0] write_ptr;
+        input [ADDR_WIDTH-1:0] init_write_ptr;
+        begin
+            if(read_ptr == write_ptr) begin
+                isempty = 1'b1;
+            end else begin
+                if ((init_write_ptr + WIN_LENGTH - 1) > DEPTH - 1) begin
+                    isempty = (read_ptr == ((init_write_ptr + WIN_LENGTH - 1) - DEPTH)) ? 1'b1 : 1'b0;
+                end else begin
+                    isempty = (read_ptr == (init_write_ptr + WIN_LENGTH - 1)) ? 1'b1 : 1'b0;
+                end
+            end
         end
     endfunction
 

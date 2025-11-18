@@ -22,8 +22,8 @@ echo ""
 echo "Compiling Verilog files..."
 
 VERILOG_FILES=(
-    "../Sram.v"
-    "../HannWin.v"
+    "../cir_buffer.v"
+    "../HannWin480.v"
     "../Multiply.v"
     "../Window_lut.v"
     "tb_Window_lut.v"
@@ -62,7 +62,7 @@ fi
 echo ""
 echo "Simulation completed!"
 
-# Run verification
+Run verification
 echo ""
 echo "Running verification..."
 python3 verify.py

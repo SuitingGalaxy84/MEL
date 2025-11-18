@@ -23,6 +23,7 @@ The `Window_lut` module applies a Hann window to incoming audio samples with ove
 - `input_float.npz` - Floating-point reference input
 - `output.txt` - RTL simulation output
 - `golden_output.txt` - Expected output from golden model
+- `frame_log.csv` - Frame start log capturing hop intervals & buffer reuse
 - `input_signal.png` - Plot of input signal
 - `verification_plot.png` - Comparison of RTL vs golden reference
 - `tb_window_lut.vcd` - Waveform file for viewing in GTKWave
@@ -73,8 +74,16 @@ The `verify.py` script:
 1. Loads the input signal
 2. Computes the expected windowed output (golden reference)
 3. Compares RTL output with the golden reference
-4. Reports any mismatches
-5. Generates comparison plots
+ 4. Reports any mismatches and detailed error margins (max / mean / RMS)
+ 5. Analyzes `frame_log.csv` to ensure hop length and frame reuse correctness
+ 6. Generates comparison plots
+
+## Buffer Control & Error Metrics
+
+- **Frame log (`frame_log.csv`)**: emitted directly by the testbench whenever `dout_en` starts a new FFT frame. The verification script checks that
+   - Frame 0 begins once `WIN_LEN` samples have been ingested.
+   - Every subsequent frame starts exactly `HOP_LEN` samples later (window reuse).
+- **Computation accuracy**: `verify.py` now prints maximum, mean, and RMS error (in Q15 LSBs and floating-point) so you can quantify the numerical margin between RTL and the golden model.
 
 ## Expected Behavior
 

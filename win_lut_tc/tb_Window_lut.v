@@ -8,6 +8,8 @@ module tb_Window_lut;
     localparam N_FFT = 512;
     localparam WIN_LEN = 480;
     localparam HOP_LEN = 160;
+    localparam BUF_DEPTH = 1 << $clog2(WIN_LEN);
+    localparam ADDR_WIDTH = $clog2(BUF_DEPTH);
     
     // Testbench signals
     reg clk;
@@ -18,15 +20,38 @@ module tb_Window_lut;
     wire dout_en;
     wire [WIDTH-1:0] dout_re;
     wire [WIDTH-1:0] dout_im;
+    wire data_full;
+    wire data_empty;
+    wire [ADDR_WIDTH-1:0] buf_count;
     // File handles
     integer input_file;
     integer output_file;
     integer scan_result;
+    integer frame_log_file;
+
+    initial begin
+        input_file     = 0;
+        output_file    = 0;
+        frame_log_file = 0;
+    end
     
     // Test control variables
     integer sample_count;
     integer frame_count;
-    reg [WIDTH-1:0] expected_re, expected_im;
+    reg dout_en_q;
+    integer frame_sample_counter;
+    integer hop_violation_count;
+    integer frame_len_violation_count;
+    integer prev_frame_start_sample;
+
+    initial begin
+        dout_en_q                = 1'b0;
+        frame_sample_counter     = 0;
+        hop_violation_count      = 0;
+        frame_len_violation_count= 0;
+        prev_frame_start_sample  = 0;
+        frame_count              = 0;
+    end
 
     // Instantiate the DUT (Device Under Test)
     WIN_LUT #(
@@ -42,7 +67,10 @@ module tb_Window_lut;
         .din_im(din_im),
         .dout_en(dout_en),
         .dout_re(dout_re),
-        .dout_im(dout_im)
+        .dout_im(dout_im),
+        .data_full(data_full),
+        .data_empty(data_empty),
+        .buf_count(buf_count)
     );
 
     // Clock generation
@@ -51,12 +79,35 @@ module tb_Window_lut;
         forever #(CLK_PERIOD/2) clk = ~clk;
     end
 
-    // Monitor output and write to file
+    // Output monitor and buffer-control tracking
     always @(posedge clk) begin
-        if (dout_en) begin
-            $fwrite(output_file, "%04h %04h\n", dout_re, dout_im);
-            $display("Time %0t: Output [%0d] - RE: %d (0x%h), IM: %d (0x%h)", 
-                     $time, sample_count, $signed(dout_re), dout_re, $signed(dout_im), dout_im);
+        dout_en_q <= dout_en;
+
+        if (frame_log_file != 0) begin
+            $fwrite(frame_log_file, "%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%h\t\t%h\n",
+            rst_n, 
+            dut.den, dut.dout_en, 
+            dut.r_idx_ptr, buf_count, 
+            data_full, data_empty, 
+            dut.CIRCULAR_BUFFER_inst.write_ptr,dut.CIRCULAR_BUFFER_inst.read_ptr,
+            dut.CIRCULAR_BUFFER_inst.init_write_ptr, dut.CIRCULAR_BUFFER_inst.init_read_ptr,
+            dut.buf_rd_jump, dut.frm_init,
+            dout_re, dout_im);
+        end
+
+        if (!rst_n) begin
+            frame_sample_counter      <= 0;
+            hop_violation_count       <= 0;
+            frame_len_violation_count <= 0;
+            prev_frame_start_sample   <= 0;
+            frame_count               <= 0;
+        end else begin
+            
+            if (dout_en) begin
+                $fwrite(output_file, "%04h %04h\n", dout_re, dout_im);
+                // $display("Time %0t: Output [%0d] - RE: %d (0x%h), IM: %d (0x%h)", 
+                        //  $time, frame_sample_counter, $signed(dout_re), dout_re, $signed(dout_im), dout_im);
+            end
         end
     end
 
@@ -72,9 +123,17 @@ module tb_Window_lut;
         frame_count = 0;
 
         // Open output file
-        output_file = $fopen("D:\\Desktop\\PG Repo\\MEL\\win_lut_tc\\output.txt", "w");
+        output_file = $fopen("output.txt", "w");
         if (output_file == 0) begin
             $display("ERROR: Could not open output.txt");
+            $finish;
+        end
+
+        // Frame log for buffer analysis
+        frame_log_file = $fopen("frame_log.txt", "w");
+        $fwrite(frame_log_file, "rst_n\t\tdien\t\tdoen\t\tptr\t\tcnt\t\tfull\t\tempty\t\tw_ptr\t\tr_ptr\t\tiw_ptr\t\tir_ptr\t\tjump\t\tinit\t\tre\t\tim\n");
+        if (frame_log_file == 0) begin
+            $display("ERROR: Could not open frame_log.txt");
             $finish;
         end
 
@@ -88,10 +147,11 @@ module tb_Window_lut;
         $display("=== Reset Released ===\n");
 
         // Open input file
-        input_file = $fopen("D:\\Desktop\\PG Repo\\MEL\\win_lut_tc\\input.txt", "r");
+        input_file = $fopen("input.txt", "r");
         if (input_file == 0) begin
             $display("ERROR: Could not open input.txt");
             $fclose(output_file);
+            $fclose(frame_log_file);
             $finish;
         end
 
@@ -107,8 +167,8 @@ module tb_Window_lut;
         while (!$feof(input_file)) begin
             scan_result = $fscanf(input_file, "%h %h\n", din_re, din_im);
             if (scan_result == 2) begin
-                $display("Time %0t: Input [%0d] - RE: %d (0x%h), IM: %d (0x%h)", 
-                         $time, sample_count, $signed(din_re), din_re, $signed(din_im), din_im);
+                // $display("Time %0t: Input [%0d] - RE: %d (0x%h), IM: %d (0x%h)", 
+                        //  $time, sample_count, $signed(din_re), din_re, $signed(din_im), din_im);
                 
                 sample_count = sample_count + 1;
                 @(posedge clk);
@@ -119,14 +179,21 @@ module tb_Window_lut;
 
         // Continue for a few more cycles to capture any remaining outputs
         den = 0;
-        repeat(N_FFT + 10) @(posedge clk);
+        repeat(N_FFT + 1000) @(posedge clk);
 
         // Close files
         $fclose(input_file);
+        input_file = 0;
         $fclose(output_file);
+        output_file = 0;
+        $fclose(frame_log_file);
+        frame_log_file = 0;
 
         $display("\n=== Test Completed ===");
         $display("Total input samples: %0d", sample_count);
+        $display("Observed frames: %0d", frame_count);
+        $display("Hop violations   : %0d", hop_violation_count);
+        $display("Frame length errs : %0d", frame_len_violation_count);
         $display("Output written to output.txt");
         $display("Run verify.py to check results");
         
@@ -139,6 +206,11 @@ module tb_Window_lut;
         #(CLK_PERIOD * 100000);  // 1ms timeout
         $display("ERROR: Simulation timeout!");
         $fclose(output_file);
+        output_file = 0;
+        if (frame_log_file != 0) begin
+            $fclose(frame_log_file);
+            frame_log_file = 0;
+        end
         $finish;
     end
 

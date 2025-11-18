@@ -53,7 +53,7 @@ module WIN_LUT#(
     input                       den, // data enable, enable computation as well.
     input [WIDTH-1:0]           din_re,
     input [WIDTH-1:0]           din_im,
-    output                      dout_en,
+    output reg                  dout_en,
     output [WIDTH-1:0]          dout_re,
     output [WIDTH-1:0]          dout_im,
     output                      data_full,
@@ -69,23 +69,34 @@ module WIN_LUT#(
     wire [WIDTH-1:0] coe_mu_in; 
     wire buf_rd_en;
     wire frm_init;
-    
-    
+    wire buf_rd_jump;
     reg [ADDR_WIDTH-1:0] r_idx_ptr;
+
+    assign buf_rd_en = (r_idx_ptr < WIN_LEN & ~data_empty) ? 1'b1 : 1'b0;
+    assign buf_rd_jump = (r_idx_ptr == WIN_LEN - 1) ? 1'b1 : 1'b0;
+    assign frm_init = (r_idx_ptr == N_FFT - 1) ? 1'b1 : 1'b0;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             r_idx_ptr  <= 0;
         end else begin
-            if (den) begin
+            if (dout_en && ~data_full) begin
                 r_idx_ptr  <= (r_idx_ptr == N_FFT - 1) ? 0 : r_idx_ptr + 1;
             end
         end
     end 
 
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            dout_en <= 1'b0;
+        end else begin
+            dout_en <= (r_idx_ptr >= WIN_LEN - 1 && r_idx_ptr < N_FFT - 1) ? 1'b1 : ~data_empty;
+        end
+    end
+    
 
-    assign buf_rd_en = (r_idx_ptr < WIN_LEN) ? 1'b1 : 1'b0;
-    assign frm_init = (r_idx_ptr == 0) ? 1'b1 : 1'b0;
+
+    
 
     CIRCULAR_BUFFER #(
         .WIDTH              (2*WIDTH        ),
@@ -99,6 +110,7 @@ module WIN_LUT#(
         .din                (data_buf_in    ),
         .full               (data_full      ),
         .rd_en              (buf_rd_en      ),
+        .rd_jump            (buf_rd_jump    ),
         .dout               (data_mu_in     ),
         .empty              (data_empty     ),
         .almost_empty       (               ),
@@ -130,7 +142,6 @@ module WIN_LUT#(
     );
 
 
-    assign dout_en = r_idx_ptr != 0 & ~data_empty;
     assign dout_re = data_mu_re;
     assign dout_im = data_mu_im;
 
