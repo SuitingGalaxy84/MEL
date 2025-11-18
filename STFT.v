@@ -1,3 +1,59 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: University of Electronic Science and Technology of China
+// Engineer: Sun Yucheng
+// 
+// Create Date: 2025-11-17
+// Design Name: Short-Time Fourier Transform (STFT) - Ping-Pong FFT wrapper
+// Module Name: STFT_PW2
+// Project Name: MEL
+// Target Devices: FPGA (e.g. Xilinx)
+// Tool Versions: Vivado 2020.2+
+// Description:
+//   STFT_PW2 is a top-level STFT processing block that performs windowing,
+//   ping-pong FFT ingestion and power-spectrum (|X|^2) calculation limited
+//   to a WIDTH-bit saturated output. The module uses a WIN_LUT for windowing
+//   and two FFT512 instances in a ping-pong configuration to maintain
+//   continuous throughput. The real and imaginary outputs from the active
+//   FFT are squared (via Multiply blocks) and summed to produce the
+//   power-per-bin output (stft_pw2_data). A data_full flag from the window
+//   buffer is exposed to upstream logic.
+//
+// Parameters:
+//   WIDTH   - data bit width for real/imag samples and intermediate results.
+//   N_FFT   - FFT length (e.g., 512).
+//   WIN_LEN - analysis window length in samples.
+//   HOP_LEN - hop/stride length between consecutive windows.
+//
+// Ports:
+//   clk            - system clock.
+//   rst_n          - active-low reset.
+//   den            - input data enable (feed samples when asserted).
+//   din_re, din_im - input real/imag sample stream (signed, WIDTH bits).
+//   data_full      - asserted when window buffer cannot accept more samples.
+//   stft_data_en   - asserted when output power sample is valid.
+//   stft_pw2_data  - saturated power spectrum output (WIDTH bits).
+//
+// Dependencies:
+//   - WIN_LUT (windowing and buffering to produce framed windows)
+//   - FFT512 (FFT core, used twice in ping-pong configuration)
+//   - Multiply (multiplier blocks used for squaring real/imag parts)
+//
+// Revision:
+//   1.00 - 2025-11-17 - Initial header and description added.
+//   1.01 - 2025-11-17 - Clarified module purpose, ports and dependencies.
+//
+// Additional Comments:
+//   - Output saturation clamps (fft_pwd_re + fft_pwd_im) to all-ones when
+//     overflow occurs; consider expanding internal accumulator width if
+//     higher dynamic range is required.
+//   - FFT cores expect active-high reset; this module inverts rst_n for them.
+//   - Ensure Multiply and FFT512 implementations match WIDTH and signedness
+//     assumptions used here.
+
+//////////////////////////////////////////////////////////////////////////////////
+
+
 module STFT_PW2#(
     parameter WIDTH             = 16,
     parameter N_FFT             = 512,
@@ -7,31 +63,36 @@ module STFT_PW2#(
     input                       clk,
     input                       rst_n,
 
-    input                       lut_en, // load window coeff enable
     input                       den, // data enable, enable computation as well.
-    input [WIDTH-1:0]           win_coe, // window coeff data
     input [WIDTH-1:0]           din_re, // input data (real)
     input [WIDTH-1:0]           din_im, // input data (imag)
-
-    output                      data_full,
     output                      stft_data_en,
-    output [WIDTH-1:0]          stft_pw2_data
+    output [WIDTH-1:0]          stft_pw2_data,
+    output                      buf_full,
+    output                      buf_empty,
+    output                      fft_1_rdy,
+    output                      fft_2_rdy
 );
     
-    wire win_do_en;
+    wire win_dout_en;
     reg fft_1_di_en, fft_2_di_en;
     wire [WIDTH-1:0] win_dout_re;
     wire [WIDTH-1:0] win_dout_im;
-    wire [WIDTH-1:0] fft_1_din_re;
-    wire [WIDTH-1:0] fft_1_din_im;
-    wire [WIDTH-1:0] fft_2_din_re;
-    wire [WIDTH-1:0] fft_2_din_im;
+    reg [WIDTH-1:0] fft_1_din_re;
+    reg [WIDTH-1:0] fft_1_din_im;
+    reg [WIDTH-1:0] fft_2_din_re;
+    reg [WIDTH-1:0] fft_2_din_im;
 
     wire [WIDTH-1:0] fft_1_do_re;
     wire [WIDTH-1:0] fft_1_do_im;
+    wire [WIDTH-1:0] fft_2_do_re;
+    wire [WIDTH-1:0] fft_2_do_im;
+
+    wire [9:0] fft_1_cnt;
+    wire [9:0] fft_2_cnt;
 
     always @(*) begin
-        case({win_do_en, fft_1_rdy, fft_2_rdy})
+        case({win_dout_en, fft_1_rdy, fft_2_rdy})
             3'b0xx: begin // no window output available
                 fft_1_di_en = 1'b0;
                 fft_2_di_en = 1'b0;
@@ -84,23 +145,22 @@ module STFT_PW2#(
         endcase    
     end 
     
-    WIN #(
+    WIN_LUT #(
         .WIDTH          (WIDTH          ),
         .N_FFT          (N_FFT          ),
         .WIN_LEN        (WIN_LEN        ),
         .HOP_LEN        (HOP_LEN        )
-    ) WIN_inst (
+    ) WIN_LUT_inst (
         .clk            (clk            ),
         .rst_n          (rst_n          ),
-        .den            (den            ), // data enable, enable computation as well.
-        .lut_en         (lut_en         ), // load window coeff enable
-        .win_coe        (win_coe        ), // window coeff data
+        .den            (den            ),
         .din_re         (din_re         ),
         .din_im         (din_im         ),
         .dout_en        (win_dout_en    ),
         .dout_re        (win_dout_re    ),
         .dout_im        (win_dout_im    ),
-        .data_full      (data_full      )
+        .data_full      (buf_full       ),
+        .data_empty     (buf_empty      )
     );
 
     // Ping-Pong FFT

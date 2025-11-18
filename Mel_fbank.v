@@ -7,9 +7,9 @@ module MEL_FBANK #(
 )(
     input clk, 
     input rst_n,
-    input fft_bin_vld,
-    input [WIDTH-1:0] fft_bin,
-    input [8:0] fft_bin_idx,
+    input stft_bin_vld,
+    input [WIDTH-1:0] stft_bin,
+    input [8:0] stft_bin_idx,
     input [2*WIDTH-1:0] mel_fbank_weight,
    
     input [1:0] mac_bits,
