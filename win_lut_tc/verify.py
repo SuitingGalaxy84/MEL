@@ -3,13 +3,13 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
 # Parameters
 WIDTH = 16
 N_FFT = 512
 WIN_LEN = 480
 HOP_LEN = 160
 Q_FORMAT = 15
+VIVADO = True  # Set to True if RTL output is from Vivado simulator
 
 def u16_to_signed(val):
     """Convert unsigned 16-bit value to signed integer."""
@@ -34,8 +34,8 @@ def float_to_q15(val):
 
 def load_hann_window():
     """Generate a Hann window matching the RTL LUT."""
-    n = np.arange(N_FFT)
-    window = 0.5 - 0.5 * np.cos((2 * np.pi * n) / (N_FFT - 1))
+    n = np.arange(WIN_LEN)
+    window = 0.5 - 0.5 * np.cos((2 * np.pi * n) / (WIN_LEN - 1))
     return window
 
 def apply_window_golden(input_re, input_im, window):
@@ -46,7 +46,7 @@ def apply_window_golden(input_re, input_im, window):
     1. Accumulates WIN_LEN samples in a circular buffer
     2. Every N_FFT cycles, outputs a windowed frame:
        - First WIN_LEN samples are multiplied by window coefficients
-       - Remaining (N_FFT - WIN_LEN) samples are zero-padded
+       - The result is centered in an N_FFT-length output frame (zero-padded)
     3. The read pointer moves back by (WIN_LEN - HOP_LEN) after each frame
     """
     num_samples = len(input_re)
@@ -85,12 +85,12 @@ def apply_window_golden(input_re, input_im, window):
         windowed_re = frame_re * window[:WIN_LEN]
         windowed_im = frame_im * window[:WIN_LEN]
         
-        # Zero-pad to N_FFT length
+        # Zero-pad to N_FFT length: symmetrical padding
         padded_re = np.zeros(N_FFT)
         padded_im = np.zeros(N_FFT)
-        padded_re[:WIN_LEN] = windowed_re
-        padded_im[:WIN_LEN] = windowed_im
-        
+        padded_re[(N_FFT - WIN_LEN) // 2: WIN_LEN + (N_FFT - WIN_LEN) // 2] = windowed_re
+        padded_im[(N_FFT - WIN_LEN) // 2: WIN_LEN + (N_FFT - WIN_LEN) // 2] = windowed_im
+
         output_frames_re.append(padded_re)
         output_frames_im.append(padded_im)
     
@@ -106,9 +106,9 @@ def summarize_error_stats(error_values):
     return max_abs, mean_abs, rms
 
 def analyze_frame_log(expected_frames):
-    path = 'frame_log.txt'
+    path = 'frame_log_vivado.txt' if VIVADO else 'frame_log.txt'
     if not os.path.exists(path):
-        print("\nframe_log.txt not found - skipping buffer control diagnostics.")
+        print(f"\n{path} not found - skipping buffer control diagnostics.")
         return
 
     # We will reconstruct the testbench's sample_count by counting cycles
@@ -163,12 +163,14 @@ def analyze_frame_log(expected_frames):
 
             if frm_init == '1' and in_frame:
                 # Frame ended on this cycle
+                print(f"Frame end at sample {sample_count}")
                 frame_len = sample_count - frame_starts[-1] + 1
                 frame_lengths.append(frame_len)
                 in_frame = False
 
             if prev_doen != '1' and doen == '1' or (frm_init == "0" and prev_frm_init == "1" and doen != "0"):
                 # Frame start observed at current sample_count
+                print(f"Frame start at sample {sample_count}")
                 frame_starts.append(sample_count)
                 in_frame = True
 
@@ -253,7 +255,8 @@ def main():
     # Load RTL output
     try:
         rtl_output = []
-        with open('output.txt', 'r') as f:
+        output_file = 'output_vivado.txt' if VIVADO else 'output.txt'
+        with open(output_file, 'r') as f:
             for line in f:
                 parts = line.strip().split()
                 if len(parts) == 2:
@@ -348,28 +351,30 @@ def main():
     
     # Generate comparison plots
     if actual_samples > 0:
-        plot_comparison(rtl_output, golden_frames_re, golden_frames_im, num_golden_frames)
+        rtl_re_float = np.array([q15_to_float(u16_to_signed(sample[0])) for sample in rtl_output])
+        rtl_im_float = np.array([q15_to_float(u16_to_signed(sample[1])) for sample in rtl_output])
+        plot_comparison(rtl_re_float, rtl_im_float, golden_frames_re, golden_frames_im, num_golden_frames)
+        plot_frame_by_frame(rtl_re_float, rtl_im_float, golden_frames_re, golden_frames_im, num_golden_frames)
     
     analyze_frame_log(num_golden_frames)
     print("\n" + "=" * 70)
 
-def plot_comparison(rtl_output, golden_re, golden_im, num_frames):
-    """Plot RTL output vs Golden reference"""
-    
+def plot_comparison(rtl_re, rtl_im, golden_re, golden_im, num_frames):
+    """Plot combined RTL output vs Golden reference"""
+
+    if len(rtl_re) == 0:
+        print("No RTL samples to plot.")
+        return
+
     # Convert golden to 1D arrays
     golden_re_1d = np.concatenate([frame for frame in golden_re])
     golden_im_1d = np.concatenate([frame for frame in golden_im])
 
-    
-    # Convert RTL output
-    rtl_re = np.array([q15_to_float(x[0]) for x in rtl_output])
-    rtl_im = np.array([q15_to_float(x[1]) for x in rtl_output])
-    
     # Truncate to same length
     min_len = min(len(golden_re_1d), len(rtl_re))
-    
+
     fig, axes = plt.subplots(4, 1, figsize=(14, 10))
-    
+
     # Plot 1: Real part comparison
     axes[0].plot(golden_re_1d[:min_len], 'b-', label='Golden', linewidth=1, alpha=0.7)
     axes[0].plot(rtl_re[:min_len], 'r--', label='RTL', linewidth=1, alpha=0.7)
@@ -377,7 +382,7 @@ def plot_comparison(rtl_output, golden_re, golden_im, num_frames):
     axes[0].set_ylabel('Value (float)')
     axes[0].legend()
     axes[0].grid(True, alpha=0.3)
-    
+
     # Plot 2: Imaginary part comparison
     axes[1].plot(golden_im_1d[:min_len], 'b-', label='Golden', linewidth=1, alpha=0.7)
     axes[1].plot(rtl_im[:min_len], 'r--', label='RTL', linewidth=1, alpha=0.7)
@@ -385,14 +390,14 @@ def plot_comparison(rtl_output, golden_re, golden_im, num_frames):
     axes[1].set_ylabel('Value (float)')
     axes[1].legend()
     axes[1].grid(True, alpha=0.3)
-    
+
     # Plot 3: Error in real part
     err_re = rtl_re[:min_len] - golden_re_1d[:min_len]
     axes[2].stem(err_re, linefmt='b-', basefmt=' ')
     axes[2].set_title('Error in Real Part (RTL - Golden)')
     axes[2].set_ylabel('Error')
     axes[2].grid(True, alpha=0.3)
-    
+
     # Plot 4: Error in imaginary part
     err_im = rtl_im[:min_len] - golden_im_1d[:min_len]
     axes[3].stem(err_im, linefmt='r-', basefmt=' ')
@@ -400,17 +405,81 @@ def plot_comparison(rtl_output, golden_re, golden_im, num_frames):
     axes[3].set_xlabel('Sample Index')
     axes[3].set_ylabel('Error')
     axes[3].grid(True, alpha=0.3)
-    
+
     # Add frame boundaries
     for ax in axes:
         for i in range(num_frames):
             frame_start = i * N_FFT
             ax.axvline(x=frame_start, color='g', linestyle='--', alpha=0.3, linewidth=1)
-    
-    plt.show()
+
     plt.tight_layout()
     plt.savefig('verification_plot.png', dpi=150)
-    print(f"Verification plot saved to: verification_plot.png")
+    plt.close(fig)
+    print("Verification plot saved to: verification_plot.png")
+
+
+def plot_frame_by_frame(rtl_re, rtl_im, golden_re_frames, golden_im_frames, num_frames):
+    """Create per-frame signal/error plots (vf/vf_fX.png)."""
+
+    if num_frames == 0:
+        print("No golden frames available for frame-by-frame plotting.")
+        return
+    vf_dir = 'vf_vivado' if VIVADO else 'vf'
+    os.makedirs(vf_dir, exist_ok=True)
+
+    total_samples = min(len(rtl_re), len(rtl_im), num_frames * N_FFT)
+    if total_samples == 0:
+        print("No RTL samples available for frame-by-frame plotting.")
+        return
+
+    max_frames = min(num_frames, len(golden_re_frames), len(golden_im_frames), total_samples // N_FFT)
+    if max_frames == 0:
+        print("Insufficient samples to generate per-frame plots.")
+        return
+
+    for frame_idx in range(max_frames):
+        start = frame_idx * N_FFT
+        end = start + N_FFT
+        rtl_frame_re = rtl_re[start:end]
+        rtl_frame_im = rtl_im[start:end]
+        golden_frame_re = golden_re_frames[frame_idx][:N_FFT]
+        golden_frame_im = golden_im_frames[frame_idx][:N_FFT]
+
+        err_re = rtl_frame_re - golden_frame_re
+        err_im = rtl_frame_im - golden_frame_im
+
+        fig, axes = plt.subplots(4, 1, figsize=(14, 10), sharex=True)
+        fig.suptitle(f'Frame {frame_idx + 1}')
+
+        axes[0].plot(golden_frame_re, 'b-', label='Golden', linewidth=1, alpha=0.8)
+        axes[0].plot(rtl_frame_re, 'r--', label='RTL', linewidth=1, alpha=0.8)
+        axes[0].set_ylabel('Real')
+        axes[0].set_title('Real Part (Signal)')
+        axes[0].legend()
+        axes[0].grid(True, alpha=0.3)
+
+        axes[1].plot(golden_frame_im, 'b-', label='Golden', linewidth=1, alpha=0.8)
+        axes[1].plot(rtl_frame_im, 'r--', label='RTL', linewidth=1, alpha=0.8)
+        axes[1].set_ylabel('Imag')
+        axes[1].set_title('Imaginary Part (Signal)')
+        axes[1].grid(True, alpha=0.3)
+
+        axes[2].stem(err_re, linefmt='b-', basefmt=' ')
+        axes[2].set_ylabel('Error (Real)')
+        axes[2].set_title('Real Part Error (RTL - Golden)')
+        axes[2].grid(True, alpha=0.3)
+
+        axes[3].stem(err_im, linefmt='r-', basefmt=' ')
+        axes[3].set_ylabel('Error (Imag)')
+        axes[3].set_xlabel('Sample Index')
+        axes[3].set_title('Imaginary Part Error (RTL - Golden)')
+        axes[3].grid(True, alpha=0.3)
+
+        fig.tight_layout(rect=(0, 0, 1, 0.97))
+        plot_path = os.path.join(vf_dir, f'vf_f{frame_idx + 1}.png')
+        fig.savefig(plot_path, dpi=150)
+        plt.close(fig)
+        print(f"Saved frame plot: {plot_path}")
     
 
 if __name__ == "__main__":

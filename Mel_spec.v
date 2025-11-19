@@ -75,7 +75,7 @@ module MEL_SPEC #(
     input [WIDTH-1:0]           signal_re, // real input signal
     input [WIDTH-1:0]           signal_im, // imag input signal
     output[WIDTH-1:0]           mel_data,
-    output                      mel_avail
+    output                      mel_avail,
     // Response Channel
     output                     fft_1_rdy,
     output                     fft_2_rdy,

@@ -23,6 +23,7 @@ $verilog_files = @(
     "..\HannWin480.v",
     "..\Multiply.v",
     "..\Window_lut.v",
+    "..\S2Sram.v",
     "tb_Window_lut.v"
 )
 

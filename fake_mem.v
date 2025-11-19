@@ -7,7 +7,7 @@ module fake_mem_gen#(
     input                           wr_en,
     input                           rd_en, 
     input [DATA_WIDTH-1:0]          data_in,
-    input [ADDR_WIDTH-1:0]          program_counter,
+    input [ADDR_WIDTH-1:0]          r_addr,
     output reg [DATA_WIDTH-1:0]     data_out
 );
     // Memory is now 32 bits wide.

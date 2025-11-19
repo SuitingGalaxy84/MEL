@@ -13,7 +13,7 @@ module CIRCULAR_BUFFER #(
 
     input                       rd_en,
     input                       rd_jump,
-    output reg [WIDTH-1:0]      dout,
+    output [WIDTH-1:0]          dout,
     output                      empty,
     output                      almost_empty,
 
@@ -28,20 +28,34 @@ module CIRCULAR_BUFFER #(
     localparam DEPTH         = 2**$clog2(WIN_LENGTH);
     localparam ADDR_WIDTH    = $clog2(DEPTH);
 
-    reg [WIDTH-1:0] mem [0:DEPTH-1];
     reg [ADDR_WIDTH-1:0] write_ptr;
+    reg [ADDR_WIDTH-1:0] write_addr;
     reg [ADDR_WIDTH-1:0] read_ptr;
     reg [ADDR_WIDTH-1:0] init_write_ptr;
     reg [ADDR_WIDTH-1:0] init_read_ptr;
     
-
+    S2SRAM #(
+        .DEPTH  (DEPTH),
+        .WIDTH (WIDTH)
+    ) S2SRAM_inst (
+        .clk(clk),
+        .rst_n(rst_n),
+        .wr_en(wr_en),
+        .wr_addr(write_addr),
+        .wr_data(din),
+        .rd_en(rd_en),
+        .rd_addr(read_ptr),
+        .rd_data(dout)
+    );
 
     // write pointer logic
     always@(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             write_ptr   <= 0;
+            write_addr  <= 0;
         end else if (wr_en & ~full) begin
             write_ptr   <= write_ptr == DEPTH - 1 ? 0 : write_ptr + 1;
+            write_addr  <= write_ptr;
         end
     end 
 
@@ -62,7 +76,6 @@ module CIRCULAR_BUFFER #(
             
 
     // count logic
-    integer i;
     always@(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             count_r <= 0;
@@ -75,22 +88,6 @@ module CIRCULAR_BUFFER #(
         end 
     end 
 
-    // memory logic
-    always@(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            dout <= 0;
-            for (i = 0; i < DEPTH; i = i + 1) begin
-                mem[i] <= 0;
-            end
-        end else begin
-            if (wr_en & ~full) begin
-                mem[write_ptr] <= din;
-            end 
-            if (rd_en & ~empty) begin
-                dout <= mem[read_ptr];
-            end 
-        end 
-    end
 
     // frm_init logic
     always@(posedge clk or negedge rst_n) begin

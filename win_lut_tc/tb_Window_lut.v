@@ -84,7 +84,7 @@ module tb_Window_lut;
         dout_en_q <= dout_en;
 
         if (frame_log_file != 0) begin
-            $fwrite(frame_log_file, "%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%h\t\t%h\n",
+            $fwrite(frame_log_file, "%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%0d\t\t%h\t\t%h\t\t%h\t\t%h\n",
             rst_n, 
             dut.den, dut.dout_en, 
             dut.r_idx_ptr, buf_count, 
@@ -92,6 +92,7 @@ module tb_Window_lut;
             dut.CIRCULAR_BUFFER_inst.write_ptr,dut.CIRCULAR_BUFFER_inst.read_ptr,
             dut.CIRCULAR_BUFFER_inst.init_write_ptr, dut.CIRCULAR_BUFFER_inst.init_read_ptr,
             dut.buf_rd_jump, dut.frm_init,
+            dut.MU_inst.a_re, dut.MU_inst.b_re,
             dout_re, dout_im);
         end
 
@@ -105,8 +106,8 @@ module tb_Window_lut;
             
             if (dout_en) begin
                 $fwrite(output_file, "%04h %04h\n", dout_re, dout_im);
-                // $display("Time %0t: Output [%0d] - RE: %d (0x%h), IM: %d (0x%h)", 
-                        //  $time, frame_sample_counter, $signed(dout_re), dout_re, $signed(dout_im), dout_im);
+                // $display("Time %0t: RE: %d (0x%h), IM: %d (0x%h)", 
+                        //  $time, $signed(dout_re), dout_re, $signed(dout_im), dout_im);
             end
         end
     end
@@ -147,7 +148,7 @@ module tb_Window_lut;
         $display("=== Reset Released ===\n");
 
         // Open input file
-        input_file = $fopen("input.txt", "r");
+        input_file = $fopen("D:\\Desktop\\PG Repo\\MEL\\win_lut_tc\\input.txt", "r");
         if (input_file == 0) begin
             $display("ERROR: Could not open input.txt");
             $fclose(output_file);
@@ -165,13 +166,10 @@ module tb_Window_lut;
         // Feed enough samples to generate multiple frames
         // We'll feed WIN_LEN + 2*HOP_LEN samples to get 3 output frames
         while (!$feof(input_file)) begin
+            @(posedge clk);
             scan_result = $fscanf(input_file, "%h %h\n", din_re, din_im);
             if (scan_result == 2) begin
-                // $display("Time %0t: Input [%0d] - RE: %d (0x%h), IM: %d (0x%h)", 
-                        //  $time, sample_count, $signed(din_re), din_re, $signed(din_im), din_im);
-                
                 sample_count = sample_count + 1;
-                @(posedge clk);
             end else begin
                 $display("Warning: Failed to read input at sample %0d", sample_count);
             end

@@ -95,7 +95,7 @@ module ICB_MSP (
     wire msp_icb_fifo_full;
     wire msp_icb_fifo_empty;
     wire msp_icb_wbuf_full;
-    wire msp_icb_wbuf_empty
+    wire msp_icb_wbuf_empty;
     wire msp_icb_stft_busy;
 
     wire [6:0] error_vector;

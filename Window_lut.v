@@ -53,7 +53,7 @@ module WIN_LUT#(
     input                       den, // data enable, enable computation as well.
     input [WIDTH-1:0]           din_re,
     input [WIDTH-1:0]           din_im,
-    output reg                  dout_en,
+    output                      dout_en,
     output [WIDTH-1:0]          dout_re,
     output [WIDTH-1:0]          dout_im,
     output                      data_full,
@@ -63,34 +63,45 @@ module WIN_LUT#(
 
     localparam BUF_DEPTH       = 2**$clog2(WIN_LEN);
     localparam ADDR_WIDTH      = $clog2(BUF_DEPTH);
-
+    localparam SHFT_DEPTH       = (N_FFT - WIN_LEN) / 2; 
+    
     wire [2*WIDTH-1:0] data_buf_in     = {din_re, din_im};
     wire [2*WIDTH-1:0] data_mu_in;
     wire [WIDTH-1:0] coe_mu_in; 
     wire buf_rd_en;
-    wire frm_init;
+    reg frm_init;
     wire buf_rd_jump;
     reg [ADDR_WIDTH-1:0] r_idx_ptr;
+    reg dout_en_r;
+    reg [2*WIDTH-1:0] dout_shft_reg [SHFT_DEPTH-1:0];
+    
+    assign dout_en = dout_en_r | frm_init;
 
     assign buf_rd_en = (r_idx_ptr < WIN_LEN & ~data_empty) ? 1'b1 : 1'b0;
     assign buf_rd_jump = (r_idx_ptr == WIN_LEN - 1) ? 1'b1 : 1'b0;
-    assign frm_init = (r_idx_ptr == N_FFT - 1) ? 1'b1 : 1'b0;
+
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             r_idx_ptr  <= 0;
+            frm_init   <= 1'b0;
         end else begin
-            if (dout_en && ~data_full) begin
+            if (r_idx_ptr >= WIN_LEN -1) begin
                 r_idx_ptr  <= (r_idx_ptr == N_FFT - 1) ? 0 : r_idx_ptr + 1;
-            end
+            end else begin
+                if (~data_empty && ~data_full) begin
+                    r_idx_ptr <= r_idx_ptr + 1;
+                end
+            end 
+            frm_init <= (r_idx_ptr == N_FFT - 1) ? 1'b1 : 1'b0;
         end
     end 
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            dout_en <= 1'b0;
+            dout_en_r <= 1'b0;
         end else begin
-            dout_en <= (r_idx_ptr >= WIN_LEN - 1 && r_idx_ptr < N_FFT - 1) ? 1'b1 : ~data_empty;
+            dout_en_r <= ((r_idx_ptr >= WIN_LEN - 1 && r_idx_ptr < N_FFT - 1) ? 1'b1 : ~data_empty);
         end
     end
     
@@ -127,8 +138,8 @@ module WIN_LUT#(
     // --- MU Output Wires ---
     wire [WIDTH-1:0] data_mu_re;
     wire [WIDTH-1:0] data_mu_im;
-    wire [WIDTH-1:0] mu_a_re = r_idx_ptr >= WIN_LEN ? 16'b0 : data_mu_in[2*WIDTH-1:WIDTH];
-    wire [WIDTH-1:0] mu_b_re = r_idx_ptr >= WIN_LEN ? 16'b0 : coe_mu_in;
+    wire [WIDTH-1:0] mu_a_re = r_idx_ptr > WIN_LEN ? 16'b0 : data_mu_in[2*WIDTH-1:WIDTH];
+    wire [WIDTH-1:0] mu_b_re = r_idx_ptr > WIN_LEN ? 16'b0 : coe_mu_in;
     // --- MU Instantiation ---
     Multiply #(
         .WIDTH              (WIDTH)
@@ -142,8 +153,27 @@ module WIN_LUT#(
     );
 
 
-    assign dout_re = data_mu_re;
-    assign dout_im = data_mu_im;
+    // Output Logic
+    integer i;
+    always @(posedge clk or negedge rst_n or posedge frm_init) begin
+        if (!rst_n) begin
+            for (i = 0; i < SHFT_DEPTH; i = i + 1) begin
+                dout_shft_reg[i] <= 0;
+            end
+        end else if (frm_init) begin
+            for (i = 0; i < SHFT_DEPTH; i = i + 1) begin
+                dout_shft_reg[i] <= 0;
+            end
+        end else begin
+            for (i = SHFT_DEPTH-1; i > 0; i = i -1) begin
+                dout_shft_reg[i] <= dout_shft_reg[i-1];
+            end
+            dout_shft_reg[0] <= {data_mu_re, data_mu_im};
+        end 
+            
+    end 
+    assign dout_re = dout_shft_reg[SHFT_DEPTH-1][2*WIDTH-1:WIDTH];
+    assign dout_im = dout_shft_reg[SHFT_DEPTH-1][WIDTH-1:0];
 
 
 endmodule

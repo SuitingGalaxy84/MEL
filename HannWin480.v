@@ -14,17 +14,8 @@ module HANN_WIN_480#(
 );
 
     
-
-    
-    always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            win_coe_out <= 16'h0000;
-        end else begin
-            win_coe_out <= addr < WIN_LEN ? win_coe[addr] : 16'h0000;
-        end 
-    end 
-    
     wire [15:0] win_coe [0:N_FFT-1];
+   
 
     assign win_coe [  0] = 16'h0000;
     assign win_coe [  1] = 16'h0001;
@@ -506,5 +497,45 @@ module HANN_WIN_480#(
     assign win_coe [477] = 16'h0006;
     assign win_coe [478] = 16'h0001;
     assign win_coe [479] = 16'h0000;
+    assign win_coe [480] = 16'h0000;
+    assign win_coe [481] = 16'h0000;
+    assign win_coe [482] = 16'h0000;
+    assign win_coe [483] = 16'h0000;
+    assign win_coe [484] = 16'h0000;
+    assign win_coe [485] = 16'h0000;
+    assign win_coe [486] = 16'h0000;
+    assign win_coe [487] = 16'h0000;
+    assign win_coe [488] = 16'h0000;
+    assign win_coe [489] = 16'h0000;
+    assign win_coe [490] = 16'h0000;
+    assign win_coe [491] = 16'h0000;
+    assign win_coe [492] = 16'h0000;
+    assign win_coe [493] = 16'h0000;
+    assign win_coe [494] = 16'h0000;
+    assign win_coe [495] = 16'h0000;
+    assign win_coe [496] = 16'h0000;
+    assign win_coe [497] = 16'h0000;
+    assign win_coe [498] = 16'h0000;
+    assign win_coe [499] = 16'h0000;
+    assign win_coe [500] = 16'h0000;
+    assign win_coe [501] = 16'h0000;
+    assign win_coe [502] = 16'h0000;
+    assign win_coe [503] = 16'h0000;
+    assign win_coe [504] = 16'h0000;
+    assign win_coe [505] = 16'h0000;
+    assign win_coe [506] = 16'h0000;
+    assign win_coe [507] = 16'h0000;
+    assign win_coe [508] = 16'h0000;
+    assign win_coe [509] = 16'h0000;
+    assign win_coe [510] = 16'h0000;
+    assign win_coe [511] = 16'h0000;
+    
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            win_coe_out <= 16'h0000;
+        end else begin
+            win_coe_out <= win_coe[addr];
+        end 
+    end 
 
 endmodule
