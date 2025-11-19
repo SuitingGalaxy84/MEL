@@ -1,5 +1,6 @@
 vf_vivado/
 frame_log_vivado.txt
+output_vivado.txt
 frame_log.txt
 output.txt
 tb_window_lut.vcd
