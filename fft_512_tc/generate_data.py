@@ -153,6 +153,7 @@ def generate_sawtooth_wave(N=512, freq_bin=8, amplitude=0.7):
     return data_re, data_im
 
 def generate_all_standard_vectors():
+    input_dir = "input_iverilog"
     """Generate all standard test vectors"""
     N = 512
     
@@ -166,43 +167,43 @@ def generate_all_standard_vectors():
     
     # Test 1: DC Impulse
     data_re, data_im = generate_dc_impulse(N, amplitude=0.99)
-    save_test_vector("input1.txt", data_re, data_im, 
+    save_test_vector(f"{input_dir}/input1.txt", data_re, data_im, 
                      "Test 1: DC Impulse (delta at n=0)")
     
     # Test 2: Sine wave at bin 10
     data_re, data_im = generate_sine_wave(N, freq_bin=10, amplitude=0.8)
-    save_test_vector("input2.txt", data_re, data_im, 
+    save_test_vector(f"{input_dir}/input2.txt", data_re, data_im, 
                      "Test 2: Sine wave at frequency bin 10")
     
     # Test 3: Complex tone at bin 20
     data_re, data_im = generate_complex_tone(N, freq_bin=20, amplitude=0.7)
-    save_test_vector("input3.txt", data_re, data_im, 
+    save_test_vector(f"{input_dir}/input3.txt", data_re, data_im, 
                      "Test 3: Complex exponential at bin 20")
     
     # Test 4: Multi-tone signal
     data_re, data_im = generate_multi_tone(N, freq_bins=[5, 15, 25, 50], 
                                            amplitudes=[0.25, 0.25, 0.25, 0.25])
-    save_test_vector("input4.txt", data_re, data_im, 
+    save_test_vector(f"{input_dir}/input4.txt", data_re, data_im, 
                      "Test 4: Multi-tone (bins 5, 15, 25, 50)")
     
     # Test 5: White noise
     data_re, data_im = generate_noise(N, amplitude=0.3, seed=42)
-    save_test_vector("input5.txt", data_re, data_im, 
+    save_test_vector(f"{input_dir}/input5.txt", data_re, data_im, 
                      "Test 5: White noise (seed=42)")
     
     # Test 6: Nyquist frequency (bin N/2)
     data_re, data_im = generate_sine_wave(N, freq_bin=N//2, amplitude=0.8)
-    save_test_vector("input6.txt", data_re, data_im, 
+    save_test_vector(f"{input_dir}/input6.txt", data_re, data_im, 
                      f"Test 6: Nyquist frequency (bin {N//2})")
     
     # Test 7: Chirp signal
     data_re, data_im = generate_chirp(N, f_start=0, f_end=100, amplitude=0.6)
-    save_test_vector("input7.txt", data_re, data_im, 
+    save_test_vector(f"{input_dir}/input7.txt", data_re, data_im, 
                      "Test 7: Linear chirp (0 to 100 bins)")
     
     # Test 8: Cosine wave at bin 30
     data_re, data_im = generate_cosine_wave(N, freq_bin=30, amplitude=0.8)
-    save_test_vector("input8.txt", data_re, data_im, 
+    save_test_vector(f"{input_dir}/input8.txt", data_re, data_im, 
                      "Test 8: Cosine wave at frequency bin 30")
     
     print()

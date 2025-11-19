@@ -57,22 +57,24 @@ echo ""
 # Check results
 echo "[Step 4] Checking results..."
 success=true
+INPUT_DIR="input_iverilog"
+OUTPUT_DIR="output_iverilog"
 
-if [ -f "output1.txt" ]; then
-    size1=$(stat -f%z "output1.txt" 2>/dev/null || stat -c%s "output1.txt" 2>/dev/null)
-    echo "  [OK] output1.txt generated ($size1 bytes)"
-else
-    echo "  [FAIL] output1.txt not found!"
-    success=false
-fi
 
-if [ -f "output2.txt" ]; then
-    size2=$(stat -f%z "output2.txt" 2>/dev/null || stat -c%s "output2.txt" 2>/dev/null)
-    echo "  [OK] output2.txt generated ($size2 bytes)"
-else
-    echo "  [FAIL] output2.txt not found!"
-    success=false
-fi
+for i in {1..8}; do
+    input_file="${INPUT_DIR}/input${i}.txt"
+    output_file="${OUTPUT_DIR}/output${i}.txt"
+
+    if [ -f "$output_file" ]; then
+        size=$(stat -f%z "$output_file" 2>/dev/null || stat -c%s "$output_file" 2>/dev/null)
+        echo "  [OK] $output_file generated ($size bytes)"
+        echo "--- Verifying bit-reversal of FFT output ---"
+        python3 verify_fft.py --input-pth "$input_file" --output-pth "$output_file"
+    else
+        echo "  [FAIL] $output_file not found!"
+        success=false
+    fi
+done
 echo ""
 
 # Final status
@@ -84,5 +86,4 @@ else
 fi
 echo "===================================="
 
-echo "--- Verifying bit-reversal of FFT output ---"
-python3 verify_fft.py verify
+

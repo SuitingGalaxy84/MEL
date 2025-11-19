@@ -9,21 +9,65 @@ initial begin : STIM
 
 	fork
 		begin
-//			LoadInputData("D:\\Desktop\\PG Repo\\MEL\\fft_512_tc\\input1.txt");
-//			GenerateInputWave;
-		//	@(posedge clock);
-			LoadInputData("D:\\Desktop\\PG Repo\\MEL\\fft_512_tc\\input2.txt");
+			//D:\\Desktop\\PG Repo\\MEL\\fft_512_tc\\
+			LoadInputData("input_iverilog/input1.txt");
+			GenerateInputWave;
+			@(posedge clock);
+			LoadInputData("input_iverilog/input2.txt");
+			GenerateInputWave;
+			@(posedge clock);
+			LoadInputData("input_iverilog/input3.txt");
+			GenerateInputWave;
+			@(posedge clock);
+			LoadInputData("input_iverilog/input4.txt");
+			GenerateInputWave;
+			@(posedge clock);
+			LoadInputData("input_iverilog/input5.txt");
+			GenerateInputWave;
+			@(posedge clock);
+			LoadInputData("input_iverilog/input6.txt");
+			GenerateInputWave;
+			@(posedge clock);
+			LoadInputData("input_iverilog/input7.txt");
+			GenerateInputWave;
+			@(posedge clock);
+			LoadInputData("input_iverilog/input8.txt");
 			GenerateInputWave;
 		end
 		begin
-//			wait (do_en == 1);
-//			repeat(N) @(posedge clock);
-//			SaveOutputData("D:\\Desktop\\PG Repo\\MEL\\fft_512_tc\\output1.txt");
-//			@(negedge clock);
 			wait (do_en == 1);
 			repeat(N) @(posedge clock);
-			SaveOutputData("D:\\Desktop\\PG Repo\\MEL\\fft_512_tc\\output2.txt");
+			SaveOutputData("output_iverilog/output1.txt");
+			@(negedge clock);
+			wait (do_en == 1);
+			repeat(N) @(posedge clock);
+			SaveOutputData("output_iverilog/output2.txt");
+			@(negedge clock);
+			wait (do_en == 1);
+			repeat(N) @(posedge clock);
+			SaveOutputData("output_iverilog/output3.txt");
+			@(negedge clock);
+			wait (do_en == 1);
+			repeat(N) @(posedge clock);
+			SaveOutputData("output_iverilog/output4.txt");
+			@(negedge clock);
+			wait (do_en == 1);
+			repeat(N) @(posedge clock);
+			SaveOutputData("output_iverilog/output5.txt");
+			@(negedge clock);
+			wait (do_en == 1);
+			repeat(N) @(posedge clock);
+			SaveOutputData("output_iverilog/output6.txt");
+			@(negedge clock);
+			wait (do_en == 1);
+			repeat(N) @(posedge clock);
+			SaveOutputData("output_iverilog/output7.txt");
+			@(negedge clock);
+			wait (do_en == 1);
+			repeat(N) @(posedge clock);
+			SaveOutputData("output_iverilog/output8.txt");
 		end
+
 	join
 
 	repeat(10) @(posedge clock);

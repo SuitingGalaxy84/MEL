@@ -13,6 +13,8 @@ The FFT uses:
 
 import numpy as np
 import matplotlib.pyplot as plt
+from argparse import ArgumentParser
+VIVADO = False
 
 def read_hex_data(filename):
     """Read hex data from file (real, imag pairs)"""
@@ -172,33 +174,36 @@ def compare_results(golden_re, golden_im, rtl_re, rtl_im, tolerance=2):
     return len(errors) == 0, max_error
 
 def plot_comparison(input_re, input_im, golden_re, golden_im, rtl_re, rtl_im):
+    import os
+    vf_pth = "vf_vivado" if VIVADO else "vf_iverilog"
+
     """Plot comparison of input, golden, and RTL outputs"""
     N = len(input_re)
     
     fig, axes = plt.subplots(3, 2, figsize=(15, 12))
     
     # Input signal
-    axes[0, 0].plot(q15_to_float(input_re), 'b.-', linewidth=1, markersize=3)
+    axes[0, 0].plot(q15_to_float(input_re), 'g--', linewidth=1, markersize=3)
     axes[0, 0].set_title('Input Signal - Real Part')
     axes[0, 0].set_xlabel('Sample Index')
     axes[0, 0].set_ylabel('Amplitude')
     axes[0, 0].grid(True, alpha=0.3)
     
-    axes[0, 1].plot(q15_to_float(input_im), 'r.-', linewidth=1, markersize=3)
+    axes[0, 1].plot(q15_to_float(input_im), 'g--', linewidth=1, markersize=3)
     axes[0, 1].set_title('Input Signal - Imaginary Part')
     axes[0, 1].set_xlabel('Sample Index')
     axes[0, 1].set_ylabel('Amplitude')
     axes[0, 1].grid(True, alpha=0.3)
     
     # FFT Magnitude
-    golden_mag = np.sqrt(q15_to_float(golden_re)**2 + q15_to_float(golden_im)**2)
-    rtl_mag = np.sqrt(q15_to_float(rtl_re)**2 + q15_to_float(rtl_im)**2)
+    golden_mag = q15_to_float(golden_re)**2 + q15_to_float(golden_im)**2
+    rtl_mag = q15_to_float(rtl_re)**2 + q15_to_float(rtl_im)**2
     
-    axes[1, 0].plot(golden_mag, 'g.-', label='Golden', linewidth=1, markersize=3)
-    axes[1, 0].plot(rtl_mag, 'b.--', label='RTL', linewidth=1, markersize=2, alpha=0.7)
-    axes[1, 0].set_title('FFT Magnitude Spectrum')
+    axes[1, 0].plot(golden_mag, 'b--', label='Golden', linewidth=1, markersize=3)
+    axes[1, 0].plot(rtl_mag, 'r--', label='RTL', linewidth=1, markersize=2, alpha=0.7)
+    axes[1, 0].set_title('FFT Power Spectrum')
     axes[1, 0].set_xlabel('Frequency Bin')
-    axes[1, 0].set_ylabel('Magnitude')
+    axes[1, 0].set_ylabel('Power')
     axes[1, 0].legend()
     axes[1, 0].grid(True, alpha=0.3)
     
@@ -206,8 +211,8 @@ def plot_comparison(input_re, input_im, golden_re, golden_im, rtl_re, rtl_im):
     golden_phase = np.angle(q15_to_float(golden_re) + 1j*q15_to_float(golden_im))
     rtl_phase = np.angle(q15_to_float(rtl_re) + 1j*q15_to_float(rtl_im))
     
-    axes[1, 1].plot(golden_phase, 'g.-', label='Golden', linewidth=1, markersize=3)
-    axes[1, 1].plot(rtl_phase, 'b.--', label='RTL', linewidth=1, markersize=2, alpha=0.7)
+    axes[1, 1].plot(golden_phase, 'b--', label='Golden', linewidth=1, markersize=3)
+    axes[1, 1].plot(rtl_phase, 'r--', label='RTL', linewidth=1, markersize=2, alpha=0.7)
     axes[1, 1].set_title('FFT Phase Spectrum')
     axes[1, 1].set_xlabel('Frequency Bin')
     axes[1, 1].set_ylabel('Phase (radians)')
@@ -218,24 +223,25 @@ def plot_comparison(input_re, input_im, golden_re, golden_im, rtl_re, rtl_im):
     error_re = golden_re - rtl_re
     error_im = golden_im - rtl_im
     
-    axes[2, 0].stem(error_re, linefmt='r-', markerfmt='ro', basefmt='k-')
+    axes[2, 0].stem(error_re, linefmt='b--', markerfmt='b.', basefmt='k-')
     axes[2, 0].set_title('Error - Real Part (Q1.15 units)')
     axes[2, 0].set_xlabel('Sample Index')
     axes[2, 0].set_ylabel('Error')
     axes[2, 0].grid(True, alpha=0.3)
     
-    axes[2, 1].stem(error_im, linefmt='r-', markerfmt='ro', basefmt='k-')
+    axes[2, 1].stem(error_im, linefmt='b--', markerfmt='b.', basefmt='k-')
     axes[2, 1].set_title('Error - Imaginary Part (Q1.15 units)')
     axes[2, 1].set_xlabel('Sample Index')
     axes[2, 1].set_ylabel('Error')
     axes[2, 1].grid(True, alpha=0.3)
     
+    fig_name = f'fft_vf_{args.output_pth.split("/")[-1].replace(".txt", "").replace("output", "")}.png'
     plt.tight_layout()
-    plt.savefig('fft_verification.png', dpi=150)
-    print("\nPlot saved as 'fft_verification.png'")
-    plt.show()
+    plt.savefig(os.path.join(vf_pth, fig_name))
+    print(f"\nPlot saved as '{os.path.join(vf_pth, fig_name)}'")
+    # plt.show()
 
-def main():
+def main(input_pth='input2.txt', output_pth='output2.txt'):
     print("="*80)
     print("512-Point FFT Verification")
     print("="*80)
@@ -250,14 +256,14 @@ def main():
     generate_data.generate_all_standard_vectors()
     
     # Read input data
-    print("\n[1/5] Reading input data from input2.txt...")
-    input_re, input_im = read_hex_data('input2.txt')
+    print(f"\n[1/5] Reading input data from {input_pth}...")
+    input_re, input_im = read_hex_data(input_pth)
     print(f"  Read {len(input_re)} input samples")
     print(f"  Input range: Real=[{input_re.min()}, {input_re.max()}], Imag=[{input_im.min()}, {input_im.max()}]")
     
     # Read RTL output
-    print("\n[2/5] Reading RTL output from output2.txt...")
-    rtl_re, rtl_im = read_hex_data('output2.txt')
+    print(f"\n[2/5] Reading RTL output from {output_pth}...")
+    rtl_re, rtl_im = read_hex_data(output_pth)
     print(f"  Read {len(rtl_re)} output samples")
     print(f"  Output range: Real=[{rtl_re.min()}, {rtl_re.max()}], Imag=[{rtl_im.min()}, {rtl_im.max()}]")
     
@@ -289,4 +295,10 @@ def main():
     return passed
 
 if __name__ == "__main__":
-    main()
+    parser = ArgumentParser(description="Verify 512-point FFT implementation")
+    parser.add_argument('--input-pth', type=str, default='input2.txt', help=
+                        "Path to input data file (default: input2.txt)")
+    parser.add_argument('--output-pth', type=str, default='output2.txt', help=
+                        "Path to RTL output data file (default: output2.txt)")
+    args = parser.parse_args()
+    main(input_pth=args.input_pth, output_pth=args.output_pth)
